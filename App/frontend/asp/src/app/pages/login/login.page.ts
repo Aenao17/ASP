@@ -30,6 +30,7 @@ export class LoginPage implements OnInit {
     try {
       const response = await this.auth.login(this.username, this.password) as any;
       await this.storage.set("_token", response.token);
+      console
       this.navCtrl.navigateRoot("/home");
     } catch (err) {
       console.error(err);

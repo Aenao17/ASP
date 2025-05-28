@@ -1,31 +1,40 @@
-import {Injectable} from "@angular/core";
-import {Storage} from "@ionic/storage-angular";
+import { Injectable } from "@angular/core";
+import { Storage } from "@ionic/storage-angular";
 
 @Injectable({
   providedIn: 'root'
 })
-
-export class StorageService{
+export class StorageService {
   private _storage: Storage | null = null;
 
-  constructor(private storage:Storage) {
+  constructor(private storage: Storage) {
     this.init();
   }
 
   async init() {
-    this._storage = await this.storage.create();
+    if (!this._storage) {
+      this._storage = await this.storage.create();
+    }
   }
 
-  public set(key: string, value: any) {
+  private async ensureInitialized() {
+    if (!this._storage) {
+      await this.init();
+    }
+  }
+
+  public async set(key: string, value: any) {
+    await this.ensureInitialized();
     return this._storage!.set(key, value);
   }
 
-  public get(key: string) {
+  public async get(key: string) {
+    await this.ensureInitialized();
     return this._storage!.get(key);
   }
 
-  public remove(key: string) {
+  public async remove(key: string) {
+    await this.ensureInitialized();
     return this._storage!.remove(key);
   }
-
 }

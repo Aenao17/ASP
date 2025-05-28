@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import {AuthService} from "./services/auth.service";
+import {StorageService} from "./services/storage.service";
 
 @Component({
   selector: 'app-root',
@@ -7,5 +9,6 @@ import { Component } from '@angular/core';
   standalone: false,
 })
 export class AppComponent {
-  constructor() {}
+  constructor( private auth: AuthService,
+               private storage: StorageService) {}
 }

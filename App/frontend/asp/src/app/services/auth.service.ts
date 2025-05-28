@@ -18,7 +18,21 @@ export class AuthService{
               private storage: StorageService,
               private router: Router,
               private navCtrl: NavController
-  ) {}
+  ) {
+    setTimeout(()=>{
+      this.storage.get('username').then((username) => {
+        if (username) {
+          this.username = username;
+        }
+      });
+
+      this.storage.get('password').then((password) => {
+        if (password) {
+          this.password = password;
+        }
+      });
+  }, 2000);
+  }
 
   async signup(username: string, password: string, email: string, institutionalEmail: string, firstName: string, lastName: string, phoneNumber: string): Promise<any> {
     const body = {username, password, email, institutionalEmail, firstName, lastName, phoneNumber, role: 'USER'};
