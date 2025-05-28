@@ -32,6 +32,10 @@ export class SignupPage implements OnInit{
   }
 
   signUp():void{
+    if(!this.username || !this.password || !this.email || !this.institutionalEmail || !this.firstName || !this.lastName || !this.phoneNumber) {
+      this.errorMessage = 'All fields are required.';
+      return;
+    }
     this.auth.signup(this.username, this.password,this.email, this.institutionalEmail, this.firstName, this.lastName, this.phoneNumber).then(() => {
       this.navCtrl.navigateRoot("/login");
     }).catch(() => {

@@ -1,27 +1,72 @@
-#container {
+ion-content {
+  --background: linear-gradient(135deg, #1e3c72, #2a5298);
+}
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
   text-align: center;
-
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+  padding: 2rem;
+  animation: fadeIn 1s ease;
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.logo-section {
+  margin-bottom: 2rem;
+  animation: floatLogo 3s ease-in-out infinite;
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-
-  color: #8c8c8c;
-
-  margin: 0;
+.asp-logo {
+  width: 120px;
+  height: auto;
+  margin-bottom: 1rem;
+  border-radius: 50%;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: transform 0.3s;
 }
 
-#container a {
-  text-decoration: none;
+.asp-logo:hover {
+  transform: scale(1.1) rotate(5deg);
+}
+
+h1 {
+  font-size: 2.2rem;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+
+p {
+  font-size: 1rem;
+  color: #ddd;
+}
+
+.button-section {
+  width: 100%;
+  max-width: 300px;
+}
+
+.action-button {
+  --background: linear-gradient(135deg, #ff7e5f, #feb47b);
+  --border-radius: 12px;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+  transition: transform 0.2s;
+}
+
+.action-button:hover {
+  transform: translateY(-3px);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes floatLogo {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
