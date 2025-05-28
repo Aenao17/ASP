@@ -12,6 +12,31 @@
         <input type="password" id="password" [(ngModel)]="password" name="password" placeholder="password" required>
       </div>
 
+      <div class="form-item">
+        <label for="email">Email</label>
+        <input type="email" id="email" [(ngModel)]="email" name="email" placeholder="email" required>
+      </div>
+
+      <div class="form-item">
+        <label for="institutionalEmail">Institutional email</label>
+        <input type="email" id="institutionalEmail" [(ngModel)]="institutionalEmail" name="institutionalEmail" placeholder="institutional email" required>
+      </div>
+
+      <div class="form-item">
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" [(ngModel)]="firstName" name="firstName" placeholder="first name" required>
+      </div>
+
+      <div class="form-item">
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" [(ngModel)]="lastName" name="lastName" placeholder="last name" required>
+      </div>
+
+      <div class="form-item">
+        <label for="phoneNumber">Phone number</label>
+        <input type="tel" id="phoneNumber" [(ngModel)]="phoneNumber" name="phoneNumber" placeholder="phone number" required>
+      </div>
+
       <button type="submit" [disabled]="!username || !password">Signup</button>
     </form>
     <p>Already have an account? <a href="/login">Log in here</a></p>
