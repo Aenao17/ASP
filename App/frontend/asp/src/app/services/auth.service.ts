@@ -29,4 +29,13 @@ export class AuthService{
     this.storage.set('password', password);
     return response;
   }
+
+  login(username: string, password: string): Promise<any> {
+    const body = {
+      username,
+      password
+    };
+    this.storage.set('username', username);
+    return lastValueFrom(this.http.post(`${this.apiUrl}/login`, body));
+  }
 }

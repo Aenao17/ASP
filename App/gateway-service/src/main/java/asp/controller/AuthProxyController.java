@@ -20,6 +20,7 @@ public class AuthProxyController {
     @Operation(summary = "Înregistrare utilizator nou")
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody String requestBody) {
+
         return forwardToUserService("/api/auth/register", requestBody);
     }
 
