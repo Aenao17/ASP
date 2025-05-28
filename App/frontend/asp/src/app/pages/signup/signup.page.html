@@ -1,0 +1,20 @@
+<ion-content [fullscreen]="true">
+  <div class="signup-form">
+    <h2>Sign Up</h2>
+    <form (ngSubmit)="signUp()">
+      <div class="form-item">
+        <label for="username">Username</label>
+        <input type="text" id="username" [(ngModel)]="username" name="username" placeholder="username" required>
+      </div>
+
+      <div class="form-item">
+        <label for="password">Password</label>
+        <input type="password" id="password" [(ngModel)]="password" name="password" placeholder="password" required>
+      </div>
+
+      <button type="submit" [disabled]="!username || !password">Signup</button>
+    </form>
+    <p>Already have an account? <a href="/login">Log in here</a></p>
+  </div>
+
+</ion-content>
