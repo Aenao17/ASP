@@ -1,0 +1,14 @@
+<ion-content [fullscreen]="true">
+  <div class="admin-container">
+    <h1>ADMINISTRATOR DASHBOARD</h1>
+
+    <div class="user-list">
+      <h2>Users</h2>
+      <ul>
+        <li *ngFor="let user of users">
+          <span>{{ user.username }} - {{ user.email }}</span>
+        </li>
+      </ul>
+  </div>
+  </div>
+</ion-content>

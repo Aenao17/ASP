@@ -11,8 +11,15 @@ export class StorageService {
     this.init();
   }
 
+  clear(){
+    if (this._storage) {
+      this._storage.clear();
+    }
+  }
+
   async init() {
     if (!this._storage) {
+
       this._storage = await this.storage.create();
     }
   }

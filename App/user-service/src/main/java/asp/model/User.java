@@ -32,7 +32,7 @@ public class User implements UserDetails {
     @Column(name="email", unique = true)
     private String email;
 
-    @Column(name="instituional_email")
+    @Column(name="institutional_email")
     private String institutionalEmail;
 
     @Column(name="first_name")

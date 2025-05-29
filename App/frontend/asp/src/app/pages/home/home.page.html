@@ -1,9 +1,21 @@
 <ion-content [fullscreen]="true">
-  <div class="home-container">
+  <div class="nav-bar" [class.show]="showNavBar">
+    <img src="assets/img/asp-logo.png" alt="ASP Logo" class="asp-logo-small">
+    <span>ASP - Asociația Studenților Programatori</span>
+  </div>
+
+  <div class="home-container" [class.shrink]="shrinkLogo">
     <div class="logo-section">
       <img src="assets/img/asp-logo.png" alt="ASP Logo" class="asp-logo">
       <h1>Bine ai venit la ASP!</h1>
       <p>Comunitatea studenților pasionați de programare 💻🚀</p>
     </div>
+  </div>
+
+  <div>
+    <ion-button class="logout-button" (click)="logout()">
+      <ion-icon name="log-out-outline"></ion-icon>
+      Logout
+    </ion-button>
   </div>
 </ion-content>

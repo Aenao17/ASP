@@ -15,7 +15,6 @@ export class AuthGuard  {
     let isAuthenticated = false;
 
     const token = await this.storage.get('_token');
-    console.log( 'Token from storage:', token);
 
     if (token != null) {
       isAuthenticated = true;

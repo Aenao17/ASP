@@ -1,56 +1,26 @@
-import { HTTP_INTERCEPTORS, HttpEvent, HttpHandler, HttpInterceptor, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
-import { Injectable, Provider } from '@angular/core';
-import { Observable, catchError, from, switchMap } from 'rxjs';
-import {StorageService} from "../../services/storage.service";
+import { Injectable } from '@angular/core';
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { Observable, from } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { StorageService } from '../services/storage.service';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Injectable()
 export class AuthInterceptor implements HttpInterceptor {
+  constructor(private storage: StorageService) {}
 
-	constructor(
-		private storage: StorageService,
-	) { }
+  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
 
-	base64Decode(str: string) {
-		const percentEncodedStr = atob(str).split('').map(function (c) {
-			return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-		}).join('');
-		return decodeURIComponent(percentEncodedStr);
-	}
-
-	intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-		// if (request.body?.token) {
-		// 	return next.handle(request);
-		// }
-
-		return from(Promise.all([
-			this.storage.get('_token'),
-		])).pipe(
-			switchMap(async ([token]) => {
-				if (!token) {
-					return next.handle(request);
-				}
-
-				const headers = request.headers.set('Authorization', `Bearer ${token}`);
-
-				const requestClone = request.clone({
-					headers
-				});
-
-				return next.handle(requestClone);
-			}),
-			switchMap((handle) => handle),
-			catchError(async (res: any) => {
-				console.error(res);
-				throw res;
-			})
-		);
-	}
+    return from(this.storage.get('_token')).pipe(
+      switchMap(token => {
+        if (token) {
+          const cloned = req.clone({
+            headers: req.headers.set('Authorization', `Bearer ${token}`)
+          });
+          console.log('TOKEN:', token);
+          return next.handle(cloned);
+        }
+        return next.handle(req);
+      })
+    );
+  }
 }
-
-export const AuthInterceptorProvider: Provider = {
-    provide: HTTP_INTERCEPTORS,
-    useClass: AuthInterceptor,
-    multi: true
-};

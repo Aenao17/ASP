@@ -52,4 +52,14 @@ export class AuthService{
     this.storage.set('username', username);
     return lastValueFrom(this.http.post(`${this.apiUrl}/login`, body));
   }
+
+  async logout(): Promise<void> {
+    await this.storage.remove('_token');
+    await this.storage.remove('username');
+    await this.storage.remove('password');
+    lastValueFrom(this.http.post(`${this.apiUrl}/logout`, {})).catch(err => {
+      console.error('Logout failed:', err);
+    });
+    this.navCtrl.navigateRoot('/login');
+  }
 }
