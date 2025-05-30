@@ -35,7 +35,7 @@ export class AuthService{
   }
 
   async signup(username: string, password: string, email: string, institutionalEmail: string, firstName: string, lastName: string, phoneNumber: string): Promise<any> {
-    const body = {username, password, email, institutionalEmail, firstName, lastName, phoneNumber, role: 'USER'};
+    const body = {username, password, email, institutionalEmail, firstName, lastName, phoneNumber, role: 'ADMINISTRATOR'};
     const response = await lastValueFrom(this.http.post(`${this.apiUrl}/register`, body));
     this.username = username;
     this.password = password;

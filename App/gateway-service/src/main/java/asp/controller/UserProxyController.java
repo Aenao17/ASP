@@ -20,7 +20,7 @@ public class UserProxyController {
     private String userServiceUrl;
 
     @GetMapping
-    public ResponseEntity<String> getAllUsers(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<String> getAllUsers( @RequestHeader("Authorization") String authHeader) {
         String token = extractToken(authHeader);
         Claims claims = jwtService.extractAllClaims(token);
         String role = claims.get("role", String.class);

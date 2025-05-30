@@ -27,7 +27,12 @@ public class AuthProxyController {
     @Operation(summary = "Autentificare utilizator")
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody String requestBody) {
-        return forwardToUserService("/api/auth/login", requestBody);
+        try {
+            return forwardToUserService("/api/auth/login", requestBody);
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Eroare la autentificare: " + e.getMessage());
+        }
     }
 
     @Operation(summary = "Logout utilizator")

@@ -69,7 +69,7 @@ public class JwtService {
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setId(jti.toString())
-                .setSubject(user.getId().toString())
+                .setSubject(user.getUsername().toString())
                 .setIssuer("spark")
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
