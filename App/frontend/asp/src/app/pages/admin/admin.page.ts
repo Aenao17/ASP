@@ -14,6 +14,7 @@ export class AdminPage implements OnInit {
   users: any[] = [];
   selectedUser: any = null;
   isEditModalOpen = false;
+  roles: any[] = [];
 
   constructor(
     private usersS: UsersService,
@@ -24,6 +25,20 @@ export class AdminPage implements OnInit {
 
   ngOnInit() {
     this.getUsers();
+    this.getRoles();
+  }
+
+  async getRoles() {
+    try {
+      const response = await this.usersS.getRoles();
+      if (response) {
+        this.roles = response;
+      } else {
+        console.error('No roles found or invalid response format:', response);
+      }
+    } catch (error) {
+      console.error('Error fetching roles:', error);
+    }
   }
 
   async getUsers() {
@@ -46,7 +61,7 @@ export class AdminPage implements OnInit {
 
   async saveUser() {
     try {
-      await this.usersS.updateUser(this.selectedUser.id, this.selectedUser);
+      await this.usersS.updateUser(this.selectedUser.username, this.selectedUser);
       this.isEditModalOpen = false;
       this.getUsers();
     } catch (error) {
@@ -54,10 +69,11 @@ export class AdminPage implements OnInit {
     }
   }
 
-  async deleteUser(userId: number) {
+  async deleteUser(username: string) {
     if (confirm('Are you sure you want to delete this user?')) {
       try {
-        await this.usersS.deleteUser(userId);
+        console.log(username);
+        await this.usersS.deleteUser(username);
         this.getUsers();
       } catch (error) {
         console.error('Error deleting user:', error);

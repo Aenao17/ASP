@@ -14,7 +14,7 @@
 
           <div class="action-buttons">
             <ion-button color="warning" (click)="editUser(user)">Edit</ion-button>
-            <ion-button color="danger" (click)="deleteUser(user.id)">Delete</ion-button>
+            <ion-button color="danger" (click)="deleteUser(user.username)">Delete</ion-button>
           </div>
         </li>
       </ul>
@@ -49,12 +49,7 @@
           <ion-item>
             <ion-label position="stacked">Role</ion-label>
             <ion-select [(ngModel)]="selectedUser.role">
-              <ion-select-option value="ADMINISTRATOR">ADMINISTRATOR</ion-select-option>
-              <ion-select-option value="ADMIN">ADMIN</ion-select-option>
-              <ion-select-option value="CD">CD</ion-select-option>
-              <ion-select-option value="PM">PM</ion-select-option>
-              <ion-select-option value="VOLUNTEER">VOLUNTEER</ion-select-option>
-              <ion-select-option value="USER">USER</ion-select-option>
+              <ion-select-option *ngFor="let role of roles" [value]="role">{{ role }}</ion-select-option>
             </ion-select>
           </ion-item>
         </ion-list>

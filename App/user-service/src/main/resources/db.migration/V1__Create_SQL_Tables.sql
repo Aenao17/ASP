@@ -15,5 +15,5 @@ CREATE TABLE token (
                        token_type VARCHAR(50),
                        revoked BOOLEAN,
                        expired BOOLEAN,
-                       user_id BIGINT REFERENCES users(id)
+                       user_id BIGINT REFERENCES users(id) ON DELETE CASCADE
 );

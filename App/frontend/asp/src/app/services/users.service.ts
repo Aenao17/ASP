@@ -28,20 +28,38 @@ export class UsersService {
     }
   }
 
-  async updateUser(userId: number, userData: any): Promise<any> {
+  async updateUser(username: string, userData: any): Promise<any> {
     try {
-      return await lastValueFrom(this.http.put(`${this.apiUrl}/${userId}`, userData));
+      const body={
+        username: userData.username,
+        email: userData.email,
+        institutionalEmail: userData.institutionalEmail,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        phoneNumber: userData.phoneNumber,
+        role: userData.role
+      }
+      return await lastValueFrom(this.http.put(`${this.apiUrl}/${username}`, body));
     } catch (error: any) {
-      console.error(`Error updating user ${userId}:`, error);
+      console.error(`Error updating user ${username}:`, error);
       throw error;
     }
   }
 
-  async deleteUser(userId: number): Promise<any> {
+  async deleteUser(username: string): Promise<any> {
     try {
-      return await lastValueFrom(this.http.delete(`${this.apiUrl}/${userId}`));
+      return await lastValueFrom(this.http.delete(`${this.apiUrl}/${username}`));
     } catch (error: any) {
-      console.error(`Error deleting user ${userId}:`, error);
+      console.error(`Error deleting user ${username}:`, error);
+      throw error;
+    }
+  }
+
+  async getRoles(): Promise<any> {
+    try {
+      return await lastValueFrom(this.http.get(`${this.apiUrl}/roles`));
+    } catch (error: any) {
+      console.error('Error fetching roles:', error);
       throw error;
     }
   }
