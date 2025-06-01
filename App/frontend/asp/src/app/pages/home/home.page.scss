@@ -3,6 +3,25 @@ ion-content {
   position: relative;
 }
 
+.logout-button {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  --background: transparent;
+  --color: #fff;
+  font-size: 0.9rem;
+  z-index: 10;
+
+  ion-icon {
+    margin-right: 4px;
+  }
+
+  &:hover {
+    color: #f0f0f0;
+    transform: scale(1.05);
+  }
+}
+
 .home-container {
   display: flex;
   flex-direction: column;
@@ -12,44 +31,61 @@ ion-content {
   text-align: center;
   padding: 2rem;
   animation: fadeIn 1s ease;
-  transition: transform 1s ease, opacity 1s ease;
-}
-
-.home-container.shrink {
-  transform: translate(-50%, -50%) scale(0.3);
-  top: 0;
-  left: 100%;
-  opacity: 0;
-  position: absolute;
 }
 
 .logo-section {
   margin-bottom: 2rem;
-  animation: floatLogo 3s ease-in-out infinite;
+  transition: transform 1s ease, opacity 1s ease;
+
+  &.shrink .asp-logo {
+    transform: scale(0.7);
+  }
+
+  .asp-logo {
+    width: 100px;
+    height: auto;
+    margin-bottom: 1rem;
+    border-radius: 50%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s;
+  }
+
+  h1 {
+    font-size: 2rem;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+  }
+
+  p {
+    font-size: 1rem;
+    color: #ddd;
+  }
 }
 
-.asp-logo {
-  width: 120px;
-  height: auto;
-  margin-bottom: 1rem;
-  border-radius: 50%;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-  transition: transform 0.3s;
-}
+.button-section {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 2rem;
 
-.asp-logo:hover {
-  transform: scale(1.1) rotate(5deg);
-}
+  .volunteers-button {
+    --background: linear-gradient(135deg, #4b6cb7, #182848);
+    --border-radius: 20px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    padding: 0.8rem 2rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-h1 {
-  font-size: 2.2rem;
-  color: #fff;
-  margin-bottom: 0.5rem;
-}
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+    }
 
-p {
-  font-size: 1rem;
-  color: #ddd;
+    ion-icon {
+      margin-right: 8px;
+    }
+  }
 }
 
 .nav-bar {
@@ -87,9 +123,4 @@ p {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-20px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes floatLogo {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
 }

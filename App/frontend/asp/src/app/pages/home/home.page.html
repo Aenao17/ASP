@@ -4,25 +4,23 @@
     <span>ASP - Asociația Studenților Programatori</span>
   </div>
 
-  <div class="home-container" [class.shrink]="shrinkLogo">
-    <div class="logo-section">
+  <ion-button class="logout-button" (click)="logout()">
+    <ion-icon name="log-out-outline"></ion-icon>
+    Logout
+  </ion-button>
+
+  <div class="home-container">
+    <div class="logo-section" [class.shrink]="shrinkLogo">
       <img src="assets/img/asp-logo.png" alt="ASP Logo" class="asp-logo">
-      <h1>Bine ai venit la ASP!</h1>
+      <h1>Bine ai venit, {{ username }}! 👋</h1>
       <p>Comunitatea studenților pasionați de programare 💻🚀</p>
     </div>
-  </div>
 
-  <div>
-    <ion-button class="logout-button" (click)="logout()">
-      <ion-icon name="log-out-outline"></ion-icon>
-      Logout
-    </ion-button>
-  </div>
-
-  <div>
-    <ion-button class="volunteers-button" (click)="openVolunteersPage()">
-      <ion-icon name="people-outline"></ion-icon>
-      Volunteers
-    </ion-button>
+    <div class="button-section">
+      <ion-button class="volunteers-button" (click)="openVolunteersPage()">
+        <ion-icon name="people-outline" slot="start"></ion-icon>
+        Volunteers
+      </ion-button>
+    </div>
   </div>
 </ion-content>

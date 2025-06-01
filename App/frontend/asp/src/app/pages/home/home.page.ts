@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import {AuthService} from "../../services/auth.service";
-import {Router} from "@angular/router";
+import { AuthService } from "../../services/auth.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: 'app-home',
@@ -9,21 +9,23 @@ import {Router} from "@angular/router";
   standalone: false,
 })
 export class HomePage {
-
   shrinkLogo = false;
   showNavBar = false;
+  username = 'Student'; // Replace with real user if available
 
-  constructor(private auth: AuthService, private router: Router) {
-    // Constructor logic if needed
-  }
+  constructor(private auth: AuthService, private router: Router) {}
 
   ngOnInit() {
+    this.getUsername();
+    // Only animate the logo shrinking, don’t hide anything else
     setTimeout(() => {
       this.shrinkLogo = true;
-      setTimeout(() => {
-        this.showNavBar = true;
-      }, 1000); // așteptăm ca shrink-ul să se termine
-    }, 5000); // 5 secunde inițiale pe ecran
+      this.showNavBar = true;
+    }, 3000);
+  }
+
+  async getUsername() {
+    this.username =  await this.auth.getUsername();
   }
 
   openVolunteersPage() {

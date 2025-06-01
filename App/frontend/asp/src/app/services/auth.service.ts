@@ -35,7 +35,7 @@ export class AuthService{
   }
 
   async signup(username: string, password: string, email: string, institutionalEmail: string, firstName: string, lastName: string, phoneNumber: string): Promise<any> {
-    const body = {username, password, email, institutionalEmail, firstName, lastName, phoneNumber, role: 'ADMINISTRATOR'};
+    const body = {username, password, email, institutionalEmail, firstName, lastName, phoneNumber, role: 'USER'};
     const response = await lastValueFrom(this.http.post(`${this.apiUrl}/register`, body));
     this.username = username;
     this.password = password;
@@ -51,6 +51,11 @@ export class AuthService{
     };
     this.storage.set('username', username);
     return lastValueFrom(this.http.post(`${this.apiUrl}/login`, body));
+  }
+
+  async getUsername(): Promise<string> {
+    const username = this.storage.get('username');
+    return await username;
   }
 
   async logout(): Promise<void> {

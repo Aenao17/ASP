@@ -3,8 +3,8 @@
     <h1>VOLUNTEERS DASHBOARD</h1>
 
     <ion-list>
-      <ion-item *ngFor="let volunteer of volunteers">
-        <ion-label>
+      <ion-card *ngFor="let volunteer of volunteers" class="volunteer-card">
+        <ion-card-content>
           <h2>{{ volunteer.firstName }} {{ volunteer.lastName }} ({{ volunteer.username }})</h2>
           <p><strong>Email:</strong> {{ volunteer.email }}</p>
           <p><strong>Institutional Email:</strong> {{ volunteer.institutionalEmail }}</p>
@@ -17,40 +17,42 @@
             <ion-button color="warning" (click)="editVolunteer(volunteer)">Edit</ion-button>
             <ion-button color="danger" (click)="deleteVolunteer(volunteer.username)">Delete</ion-button>
           </div>
-        </ion-label>
-      </ion-item>
+        </ion-card-content>
+      </ion-card>
     </ion-list>
+
 
     <ion-button expand="full" (click)="toggleAddForm()">
       {{ isAddFormOpen ? 'Hide Add Volunteer' : 'Add Volunteer' }}
     </ion-button>
 
-    <ion-card *ngIf="isAddFormOpen">
+    <ion-card *ngIf="isAddFormOpen" class="add-volunteer-card">
       <ion-card-header>
-        <ion-card-title>Add Volunteer</ion-card-title>
+        <ion-card-title>Add a New Volunteer</ion-card-title>
       </ion-card-header>
       <ion-card-content>
         <ion-list>
           <ion-item>
-            <ion-label position="stacked">Username Linked</ion-label>
+            <ion-label position="fixed">Username</ion-label>
             <ion-input [(ngModel)]="newVolunteer.usernameLinked"></ion-input>
           </ion-item>
 
           <ion-item>
-            <ion-label position="stacked">Points</ion-label>
+            <ion-label position="fixed">Points</ion-label>
             <ion-input type="number" [(ngModel)]="newVolunteer.points"></ion-input>
           </ion-item>
 
           <ion-item>
-            <ion-label position="stacked">Birthday</ion-label>
+            <ion-label position="fixed">Birthday</ion-label>
             <ion-datetime
-              display-format="YYYY-MM-DD"
+              presentation="date"
+              color="secondary"
               [(ngModel)]="newVolunteer.birthday">
             </ion-datetime>
           </ion-item>
 
           <ion-item>
-            <ion-label position="stacked">Department</ion-label>
+            <ion-label position="fixed">Department</ion-label>
             <ion-select [(ngModel)]="newVolunteer.departament">
               <ion-select-option value="HR">HR</ion-select-option>
               <ion-select-option value="EVENTS">EVENTS</ion-select-option>
@@ -59,7 +61,7 @@
             </ion-select>
           </ion-item>
         </ion-list>
-        <ion-button expand="full" (click)="addVolunteer()">Submit</ion-button>
+        <ion-button expand="block" class="submit-button" (click)="addVolunteer()">✨ Add Volunteer ✨</ion-button>
       </ion-card-content>
     </ion-card>
   </div>
