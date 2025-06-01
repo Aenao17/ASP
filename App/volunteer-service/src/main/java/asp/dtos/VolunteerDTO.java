@@ -10,12 +10,14 @@ public class VolunteerDTO {
     private String birthday; // Changed to String for easier JSON serialization
     private String departament; // Changed to String for easier JSON serialization
 
-    public VolunteerDTO(String usernameLinked, Double points, LocalDateTime birthday, Departament departament) {
+    public VolunteerDTO(String usernameLinked, String points, String birthday, Departament departament) {
         this.usernameLinked = usernameLinked;
-        this.points = points;
-        this.birthday = birthday.toString();
+        this.points = Double.parseDouble(points);
+        this.birthday = birthday;
         this.departament = departament.name();
     }
+
+    public VolunteerDTO() {}
 
     public String getUsernameLinked() {
         return usernameLinked;

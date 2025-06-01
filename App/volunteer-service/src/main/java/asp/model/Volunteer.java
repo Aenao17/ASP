@@ -5,10 +5,10 @@ import java.time.LocalDateTime;
 public class Volunteer {
     private String usernameLinked;
     private Double points;
-    private LocalDateTime birthday;
+    private String birthday;
     private Departament departament;
 
-    public Volunteer(String usernameLinked, Double points, LocalDateTime birthday, Departament departament) {
+    public Volunteer(String usernameLinked, Double points, String birthday, Departament departament) {
         this.usernameLinked = usernameLinked;
         this.points = points;
         this.birthday = birthday;
@@ -31,11 +31,11 @@ public class Volunteer {
         this.points = points;
     }
 
-    public LocalDateTime getBirthday() {
+    public String getBirthday() {
         return birthday;
     }
 
-    public void setBirthday(LocalDateTime birthday) {
+    public void setBirthday(String birthday) {
         this.birthday = birthday;
     }
 

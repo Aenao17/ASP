@@ -3,6 +3,7 @@ package asp.controller;
 
 import asp.database.DAO;
 import asp.dtos.VolunteerDTO;
+import asp.model.Departament;
 import asp.model.Volunteer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpHandler;
@@ -47,7 +48,7 @@ public class VolunteersController implements HttpHandler {
         try{
             List<Volunteer> volunteers = Dao.getAllVolunteers();
             List<VolunteerDTO> volunteerDTOs = volunteers.stream()
-                    .map(v -> new VolunteerDTO(v.getUsernameLinked(), v.getPoints(), v.getBirthday(), v.getDepartament()))
+                    .map(v -> new VolunteerDTO(v.getUsernameLinked(), v.getPoints().toString(), v.getBirthday(), v.getDepartament()))
                     .toList();
             String json = mapper.writeValueAsString(volunteerDTOs);
 
@@ -66,8 +67,8 @@ public class VolunteersController implements HttpHandler {
     private void handlePost(com.sun.net.httpserver.HttpExchange exchange) throws IOException {
         InputStream is = exchange.getRequestBody();
         try {
-            Volunteer v = mapper.readValue(is, Volunteer.class);
-            Dao.addVolunteer(v.getUsernameLinked(), v.getPoints(), v.getBirthday(), v.getDepartament());
+            VolunteerDTO v = mapper.readValue(is, VolunteerDTO.class);
+            Dao.addVolunteer(v.getUsernameLinked(), v.getPoints(), v.getBirthday(), Departament.valueOf(v.getDepartament()));
             String response = "Volunteer added successfully";
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();

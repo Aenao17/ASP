@@ -30,18 +30,18 @@ export class VolunteerService {
 
   async addVolunteer(volunteerData: any): Promise<any> {
     try {
-
-      //format birthday to timestamp
-      if (volunteerData.birthday) {
-        const date = new Date(volunteerData.birthday);
-        volunteerData.birthday = date.getTime();
-      }
-      console.log(volunteerData.birthday);
+      //format birthday to DD-MM-YYYY
+      const date = new Date(volunteerData.birthday);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+      const year = date.getFullYear();
+      volunteerData.birthday = `${day}-${month}-${year}`.toString();
+      console.log('Formatted birthday:', volunteerData.birthday);
       const body = {
         usernameLinked: volunteerData.usernameLinked,
-        points: volunteerData.points,
+        points: volunteerData.points.toString(),
         birthday: volunteerData.birthday,
-        departament: volunteerData.departament
+        departament: volunteerData.departament.toString()
       };
       return await lastValueFrom(this.http.post(`${this.apiUrl}`, body));
     } catch (error: any) {
