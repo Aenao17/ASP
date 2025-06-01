@@ -10,6 +10,8 @@ import { NavController } from '@ionic/angular';
 })
 export class VolunteersPage implements OnInit {
   volunteers: any[] = [];
+  selectedVolunteer: any = null;
+  isEditModalOpen = false;
   isAddFormOpen = false;
 
   newVolunteer = {
@@ -31,7 +33,6 @@ export class VolunteersPage implements OnInit {
   async getVolunteers() {
     try {
       const response = await this.volunteerS.getVolunteers();
-      console.log(response);
       if (response) {
         this.volunteers = response;
       } else {
@@ -56,9 +57,42 @@ export class VolunteersPage implements OnInit {
         departament: 'HR'
       };
       this.isAddFormOpen = false;
-      this.getVolunteers();
     } catch (error) {
       console.error('Error adding volunteer:', error);
     }
+    this.getVolunteers();
+  }
+
+  editVolunteer(volunteer: any) {
+    this.selectedVolunteer = { ...volunteer };
+    this.isEditModalOpen = true;
+  }
+
+  async saveVolunteer() {
+    try {
+      await this.volunteerS.updateVolunteer(this.selectedVolunteer.username, this.selectedVolunteer);
+      this.isEditModalOpen = false;
+      this.getVolunteers();
+    } catch (error) {
+      console.error('Error updating volunteer:', error);
+    }
+    this.getVolunteers();
+  }
+
+  async deleteVolunteer(username: string) {
+    if (confirm('Are you sure you want to delete this volunteer?')) {
+      try {
+        await this.volunteerS.deleteVolunteer(username);
+        this.getVolunteers();
+      } catch (error) {
+        console.error('Error deleting volunteer:', error);
+      }
+      this.getVolunteers();
+    }
+  }
+
+  closeEditModal() {
+    this.isEditModalOpen = false;
+    this.selectedVolunteer = null;
   }
 }

@@ -23,8 +23,10 @@ export class VolunteerService {
     try {
       return await lastValueFrom(this.http.get(`${this.apiUrl}`));
     } catch (error: any) {
-      console.error('Error fetching volunteers:', error);
-      throw error;
+      if(error.status !=200) {
+        console.error('Error fetching volunteers:', error);
+        throw error;
+      }
     }
   }
 
@@ -45,8 +47,39 @@ export class VolunteerService {
       };
       return await lastValueFrom(this.http.post(`${this.apiUrl}`, body));
     } catch (error: any) {
-      console.error('Error adding volunteer:', error);
-      throw error;
+      if(error.status !=200) {
+        console.error('Error adding volunteer:', error);
+        throw error;
+      }
     }
   }
+
+  async updateVolunteer(username: string, volunteerData: any): Promise<any> {
+    try {
+      const body = {
+        usernameLinked: volunteerData.username,
+        points: volunteerData.points.toString(),
+        birthday: volunteerData.birthday,
+        departament: volunteerData.departament.toString()
+      }
+      return await lastValueFrom(this.http.put(`${this.apiUrl}/${username}`, body));
+    } catch (error: any) {
+      if(error.status !=200) {
+        console.error(`Error updating volunteer ${username}:`, error);
+        throw error;
+      }
+    }
+  }
+
+  async deleteVolunteer(username: string): Promise<any> {
+    try {
+      return await lastValueFrom(this.http.delete(`${this.apiUrl}/${username}`));
+    } catch (error: any) {
+      if(error.status !=200) {
+        console.error(`Error deleting volunteer ${username}:`, error);
+        throw error;
+      }
+    }
+  }
+
 }

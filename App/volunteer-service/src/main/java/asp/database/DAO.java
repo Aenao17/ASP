@@ -71,4 +71,34 @@ public class DAO {
             System.out.println(e.getMessage());
         }
     }
+
+    public void updateVolunteer(String usernameLinked, Double points, String birthday, Departament departament) {
+        String sql = "UPDATE volunteers SET points = ?, birthday = ?, departament = ? WHERE usernameLinked = ?";
+        try (Connection conn = DBUtils.getConnection();
+             var pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDouble(1, points);
+            pstmt.setString(2, birthday);
+            pstmt.setString(3, departament.name());
+            pstmt.setString(4, usernameLinked);
+            var respsonse = pstmt.executeUpdate();
+            if (respsonse == 0) {
+                System.out.println("No volunteer found with username: " + usernameLinked);
+            } else {
+                System.out.println("Volunteer updated successfully.");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void deleteVolunteer(String usernameLinked) {
+        String sql = "DELETE FROM volunteers WHERE usernameLinked = ?";
+        try (Connection conn = DBUtils.getConnection();
+             var pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, usernameLinked);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }

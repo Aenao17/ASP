@@ -1,5 +1,8 @@
 package asp.controller;
 
+import asp.dtos.FullVolunteer;
+import asp.dtos.UserDTO;
+import asp.dtos.VolunteerDTO;
 import asp.service.JwtService;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/volunteers")
@@ -18,23 +25,77 @@ public class VolunteerProxyController {
 
     @Value("${services.volunteer}")
     private String volunteerServiceUrl;
+    @Value("${services.user}")
+    private String userServiceUrl;
 
     @GetMapping
-    public ResponseEntity<String> getAllVolunteers(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> getAllVolunteers(@RequestHeader("Authorization") String authHeader) {
         String role = extractUserRole(authHeader);
         if (!isAllowedForGet(role)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied: only CD, ADMIN, ADMINISTRATOR, or PM can access volunteers.");
         }
 
-        ResponseEntity<String> response = restTemplate.exchange(
-                volunteerServiceUrl + "/api/volunteers",  // assumes backend path
+        // Get volunteers from volunteer service
+        ResponseEntity<VolunteerDTO[]> volunteerResponse = restTemplate.exchange(
+                volunteerServiceUrl + "/api/volunteers",  // assuming the volunteer backend path
                 HttpMethod.GET,
                 null,
-                String.class
+                VolunteerDTO[].class
         );
+        VolunteerDTO[] volunteers = volunteerResponse.getBody();
 
-        return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+        // Get users from user service
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", authHeader);
+        HttpEntity<?> userRequestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<UserDTO[]> userResponse = restTemplate.exchange(
+                userServiceUrl + "/api/users",
+                HttpMethod.GET,
+                userRequestEntity,
+                UserDTO[].class
+        );
+        UserDTO[] users = userResponse.getBody();
+
+        // Merge volunteers with user details
+        List<FullVolunteer> fullVolunteers = Arrays.stream(volunteers)
+                .map(vol -> {
+                    Optional<UserDTO> userOpt = Arrays.stream(users)
+                            .filter(u -> u.getUsername().equals(vol.getUsernameLinked()))
+                            .findFirst();
+
+                    if (userOpt.isPresent()) {
+                        UserDTO user = userOpt.get();
+                        return new FullVolunteer(
+                                user.getUsername(),
+                                user.getEmail(),
+                                user.getInstitutionalEmail(),
+                                user.getPhoneNumber(),
+                                user.getFirstName(),
+                                user.getLastName(),
+                                vol.getBirthday(),
+                                vol.getDepartament(),
+                                vol.getPoints().toString()
+                        );
+                    } else {
+                        return new FullVolunteer(
+                                vol.getUsernameLinked(),
+                                "unknown",
+                                "unknown",
+                                "unknown",
+                                "unknown",
+                                "unknown",
+                                vol.getBirthday(),
+                                vol.getDepartament(),
+                                vol.getPoints().toString()
+                        );
+                    }
+                })
+                .toList();
+
+        return ResponseEntity.ok(fullVolunteers);
     }
+
 
     @PostMapping
     public ResponseEntity<String> addVolunteer(@RequestBody String volunteerJson, @RequestHeader("Authorization") String authHeader) {
@@ -57,6 +118,67 @@ public class VolunteerProxyController {
 
         return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
     }
+
+    @DeleteMapping("/{username}")
+    public ResponseEntity<String> deleteVolunteerByUsername(
+            @PathVariable String username,
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        String token = extractToken(authHeader);
+        Claims claims = jwtService.extractAllClaims(token);
+        String role = claims.get("role", String.class);
+
+        if (!"ADMINISTRATOR".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Access denied: only ADMINISTRATOR can delete volunteers.");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", authHeader);
+
+        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                volunteerServiceUrl + "/api/volunteers/" + username,
+                HttpMethod.DELETE,
+                requestEntity,
+                String.class
+        );
+
+        return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+    }
+
+    @PutMapping("/{username}")
+    public ResponseEntity<String> updateVolunteer(
+            @PathVariable String username,
+            @RequestBody String volunteerJson,
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        String token = extractToken(authHeader);
+        Claims claims = jwtService.extractAllClaims(token);
+        String role = claims.get("role", String.class);
+
+        if (!"ADMINISTRATOR".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Access denied: only ADMINISTRATOR can update volunteers.");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", authHeader);
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(volunteerJson, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                volunteerServiceUrl + "/api/volunteers",
+                HttpMethod.PUT,
+                requestEntity,
+                String.class
+        );
+
+        return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+    }
+
 
     private String extractUserRole(String authHeader) {
         String token = extractToken(authHeader);
