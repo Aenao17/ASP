@@ -54,12 +54,17 @@ export class AuthService{
   }
 
   async logout(): Promise<void> {
+    try {
+      await lastValueFrom(this.http.post(`${this.apiUrl}/logout`, {}));
+    } catch (err) {
+      console.warn('Backend logout failed, proceeding anyway.');
+    }
+
+    // Always clear local tokens
     await this.storage.remove('_token');
     await this.storage.remove('username');
     await this.storage.remove('password');
-    lastValueFrom(this.http.post(`${this.apiUrl}/logout`, {})).catch(err => {
-      console.error('Logout failed:', err);
-    });
+
     this.navCtrl.navigateRoot('/login');
   }
 }
