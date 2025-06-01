@@ -26,6 +26,10 @@ export class HomePage {
     }, 5000); // 5 secunde inițiale pe ecran
   }
 
+  openVolunteersPage() {
+    this.router.navigate(['/volunteers']);
+  }
+
   logout() {
     this.auth.logout().then(() => {
       this.router.navigate(['/login']);

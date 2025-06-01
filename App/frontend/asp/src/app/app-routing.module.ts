@@ -28,6 +28,11 @@ const routes: Routes = [
     path: 'admin',
     loadChildren: () => import('./pages/admin/admin.module').then( m => m.AdminPageModule),
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'volunteers',
+    loadChildren: () => import('./pages/volunteers/volunteers.module').then( m => m.VolunteersPageModule),
+    canActivate: [AuthGuard]
   }
 ];
 

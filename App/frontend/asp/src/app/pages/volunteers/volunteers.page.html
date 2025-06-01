@@ -1,0 +1,58 @@
+<ion-content [fullscreen]="true">
+  <div class="volunteer-container">
+    <h1>VOLUNTEERS DASHBOARD</h1>
+
+    <ion-list>
+      <ion-item *ngFor="let volunteer of volunteers">
+        <ion-label>
+          <h2>{{ volunteer.usernameLinked }}</h2>
+          <p><strong>Points:</strong> {{ volunteer.points }}</p>
+          <p><strong>Birthday:</strong> {{ volunteer.birthday }}</p>
+          <p><strong>Department:</strong> {{ volunteer.departament }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="full" (click)="toggleAddForm()">
+      {{ isAddFormOpen ? 'Hide Add Volunteer' : 'Add Volunteer' }}
+    </ion-button>
+
+    <ion-card *ngIf="isAddFormOpen">
+      <ion-card-header>
+        <ion-card-title>Add Volunteer</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item>
+            <ion-label position="stacked">Username Linked</ion-label>
+            <ion-input [(ngModel)]="newVolunteer.usernameLinked"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Points</ion-label>
+            <ion-input type="number" [(ngModel)]="newVolunteer.points"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Birthday</ion-label>
+            <ion-datetime
+              display-format="YYYY-MM-DD"
+              [(ngModel)]="newVolunteer.birthday">
+            </ion-datetime>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Department</ion-label>
+            <ion-select [(ngModel)]="newVolunteer.departament">
+              <ion-select-option value="HR">HR</ion-select-option>
+              <ion-select-option value="EVENTS">EVENTS</ion-select-option>
+              <ion-select-option value="EXTERNE">EXTERNE</ion-select-option>
+              <ion-select-option value="IMPR">IMPR</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-list>
+        <ion-button expand="full" (click)="addVolunteer()">Submit</ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
