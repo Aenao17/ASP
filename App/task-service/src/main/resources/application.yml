@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: App
+  profiles:
+    active:
+      - database
+
+springdoc.swagger-ui.enable: true
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+server:
+  port: 8083

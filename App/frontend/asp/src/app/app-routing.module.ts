@@ -33,6 +33,10 @@ const routes: Routes = [
     path: 'volunteers',
     loadChildren: () => import('./pages/volunteers/volunteers.module').then( m => m.VolunteersPageModule),
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'task',
+    loadChildren: () => import('./pages/task/task.module').then( m => m.TaskPageModule)
   }
 ];
 

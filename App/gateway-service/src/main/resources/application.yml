@@ -14,6 +14,7 @@ spring:
 services:
   user: http://localhost:8081
   volunteer: http://localhost:8082
+  task: http://localhost:8083
 
 server:
   port: 8080

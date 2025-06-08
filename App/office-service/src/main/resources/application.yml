@@ -1,0 +1,7 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://aenao:1707@localhost:27017
+      database: office_db
+server:
+  port: 8083
