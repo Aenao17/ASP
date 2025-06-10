@@ -35,6 +35,23 @@ public class AuthProxyController {
         }
     }
 
+    @Operation(summary="Get rol utilizator")
+    @GetMapping("/role")
+    public ResponseEntity<String> getUserRole(@RequestHeader("Authorization") String authHeader) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", authHeader);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                userServiceUrl + "/api/auth/role",
+                HttpMethod.GET,
+                entity,
+                String.class
+        );
+
+        return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+    }
+
     @Operation(summary = "Logout utilizator")
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String authHeader) {

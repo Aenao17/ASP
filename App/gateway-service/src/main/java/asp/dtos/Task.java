@@ -1,43 +1,41 @@
 package asp.dtos;
 
-public class TaskDto {
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Task {
+    @Setter
+    @Getter
+    private int id;
+    @Setter
+    @Getter
     private String title;
+    @Setter
+    @Getter
     private String description;
     private String status;
-    private String ownerId;
+    private Integer ownerId;
     private String createdAt;
     private String deadline;
-    private String[] volunteers;
-    private Integer[] subTasks;
+    private List<Integer> volunteers;
+    private List<Integer> subTasks;
 
-    public TaskDto() {
+    public Task() {
     }
 
-    public TaskDto(String title, String description, String status, String ownerId, String createdAt, String deadline, String[] volunteers, Integer[] subTasks) {
+    public Task(int id, String title, String description, String status, Integer ownerId, String createdAt, String deadline) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
         this.ownerId = ownerId;
         this.createdAt = createdAt;
         this.deadline = deadline;
-        this.volunteers = volunteers;
-        this.subTasks = subTasks;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+        this.volunteers = new ArrayList<>();
+        this.subTasks = new ArrayList<>();
     }
 
     public String getStatus() {
@@ -48,11 +46,11 @@ public class TaskDto {
         this.status = status;
     }
 
-    public String getOwnerId() {
+    public Integer getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(String ownerId) {
+    public void setOwnerId(Integer ownerId) {
         this.ownerId = ownerId;
     }
 
@@ -72,19 +70,19 @@ public class TaskDto {
         this.deadline = deadline;
     }
 
-    public String[] getVolunteers() {
+    public List<Integer> getVolunteers() {
         return volunteers;
     }
 
-    public void setVolunteers(String[] volunteers) {
+    public void setVolunteers(List<Integer> volunteers) {
         this.volunteers = volunteers;
     }
 
-    public Integer[] getSubTasks() {
+    public List<Integer> getSubTasks() {
         return subTasks;
     }
 
-    public void setSubTasks(Integer[] subTasks) {
+    public void setSubTasks(List<Integer> subTasks) {
         this.subTasks = subTasks;
     }
 }

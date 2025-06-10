@@ -12,6 +12,7 @@ import asp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -72,6 +73,13 @@ public class AuthenticationService {
                 .revoked(false)
                 .build();
         return tokenRepository.save(token);
+    }
+
+    public String getUserRole(Authentication authentication) {
+        String username = authentication.getName();
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.getRole().name();
     }
 
     private void revokeAllUserTokens(User user) {

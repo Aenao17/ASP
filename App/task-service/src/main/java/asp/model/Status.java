@@ -1,8 +1,8 @@
 package asp.model;
 
 public enum Status {
-    ACTIVE,
+    PENDING,
     IN_PROGRESS,
     COMPLETED,
-    OVERDUE
+    EXPIRED
 }

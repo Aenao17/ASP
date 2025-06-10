@@ -32,6 +32,10 @@ export class HomePage {
     this.router.navigate(['/volunteers']);
   }
 
+openTaskPage() {
+    this.router.navigate(['/task']);
+  }
+
   logout() {
     this.auth.logout().then(() => {
       this.router.navigate(['/login']);

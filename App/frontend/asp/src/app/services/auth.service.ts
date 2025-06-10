@@ -54,8 +54,31 @@ export class AuthService{
   }
 
   async getUsername(): Promise<string> {
-    const username = this.storage.get('username');
-    return await username;
+    try {
+      const username = this.storage.get('username');
+      return await username;
+    } catch (error: any) {
+      return 'USER';
+    }
+  }
+
+  clear(): void {
+    this.storage.clear();
+  }
+
+  async getUserRole(): Promise<string> {
+    try{
+      const response = await lastValueFrom(this.http.get(`${this.apiUrl}/role`));
+      return response as string;
+    }catch (error: any) {
+      if (error.status === 200) {
+        return error.error.text;
+      } else {
+        console.error('Error fetching user role:', error);
+        throw error;
+      }
+    }
+
   }
 
   async logout(): Promise<void> {

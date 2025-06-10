@@ -1,0 +1,59 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Add New Task</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" *ngIf="userRole !== 'USER'">
+    <ion-list>
+      <ion-item>
+        <ion-label position="stacked" for="title">Title</ion-label>
+        <ion-input id="title" type="text" formControlName="title"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" for="description">Description</ion-label>
+        <ion-textarea id="description" rows="3" formControlName="description"></ion-textarea>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" for="status">Status</ion-label>
+        <ion-select id="status" formControlName="status">
+          <ion-select-option value="pending">Pending</ion-select-option>
+          <ion-select-option value="in-progress">In Progress</ion-select-option>
+          <ion-select-option value="completed">Completed</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" for="deadline">Deadline</ion-label>
+        <ion-datetime id="deadline" display-format="MMM DD, YYYY HH:mm" picker-format="MMM DD YYYY HH:mm" formControlName="deadline"></ion-datetime>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="full" type="submit" [disabled]="loading">Add Task</ion-button>
+
+    <div *ngIf="error">
+      <ion-text color="danger">{{ error }}</ion-text>
+    </div>
+  </form>
+
+  <ion-item-divider></ion-item-divider>
+  <ion-list-header>All Tasks</ion-list-header>
+
+  <ion-spinner *ngIf="loading" name="dots"></ion-spinner>
+
+  <ion-list *ngIf="!loading && tasks.length">
+    <ion-item *ngFor="let t of tasks">
+      <ion-label>
+        <h2>{{ t.title }}</h2>
+        <p>Status: {{ t.status }}</p>
+        <p>Owner: {{ t.ownerId }}</p>
+        <p>Deadline: {{ t.deadline | date:'short' }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-text *ngIf="!loading && !tasks.length">No tasks found.</ion-text>
+</ion-content>

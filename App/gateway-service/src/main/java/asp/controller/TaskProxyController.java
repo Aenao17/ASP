@@ -1,5 +1,6 @@
 package asp.controller;
 
+import asp.dtos.Task;
 import asp.service.JwtService;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -23,36 +27,33 @@ public class TaskProxyController {
     public ResponseEntity<?> getAllTasks(@RequestHeader("Authorization") String authHeader) {
         String role = extractUserRole(authHeader);
         if (!isAllowedForGet(role)) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .body("Access denied: only CD, ADMIN, ADMINISTRATOR, or PM can view tasks.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Access denied: only CD, ADMIN, ADMINISTRATOR, or PM can access tasks.");
         }
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", authHeader);
-        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
+        HttpEntity<?> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(
+        ResponseEntity<Task[]> taskResponse = restTemplate.exchange(
                 taskServiceUrl + "/api/tasks",
                 HttpMethod.GET,
-                requestEntity,
-                String.class
+                entity,
+                Task[].class
         );
 
-        return ResponseEntity
-                .status(response.getStatusCode())
-                .body(response.getBody());
+        List<Task> tasks = Arrays.asList(taskResponse.getBody());
+        return ResponseEntity.ok(tasks);
     }
 
     @PostMapping
-    public ResponseEntity<String> addTask(
+    public ResponseEntity<String> createTask(
             @RequestBody String taskJson,
             @RequestHeader("Authorization") String authHeader
     ) {
         String role = extractUserRole(authHeader);
         if (!isAllowedForPost(role)) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Access denied: only CD, ADMIN, or ADMINISTRATOR can create tasks.");
         }
 
@@ -69,72 +70,8 @@ public class TaskProxyController {
                 String.class
         );
 
-        return ResponseEntity
-                .status(response.getStatusCode())
-                .body(response.getBody());
+        return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
     }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<String> updateTask(
-            @PathVariable int id,
-            @RequestBody String taskJson,
-            @RequestHeader("Authorization") String authHeader
-    ) {
-        String role = extractUserRole(authHeader);
-        if (!"ADMINISTRATOR".equals(role)) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .body("Access denied: only ADMINISTRATOR can update tasks.");
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", authHeader);
-
-        HttpEntity<String> requestEntity = new HttpEntity<>(taskJson, headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                taskServiceUrl + "/api/tasks/" + id,
-                HttpMethod.PUT,
-                requestEntity,
-                String.class
-        );
-
-        return ResponseEntity
-                .status(response.getStatusCode())
-                .body(response.getBody());
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteTask(
-            @PathVariable int id,
-            @RequestHeader("Authorization") String authHeader
-    ) {
-        String role = extractUserRole(authHeader);
-        if (!"ADMINISTRATOR".equals(role)) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .body("Access denied: only ADMINISTRATOR can delete tasks.");
-        }
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", authHeader);
-
-        HttpEntity<?> requestEntity = new HttpEntity<>(headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                taskServiceUrl + "/api/tasks/" + id,
-                HttpMethod.DELETE,
-                requestEntity,
-                String.class
-        );
-
-        return ResponseEntity
-                .status(response.getStatusCode())
-                .body(response.getBody());
-    }
-
-    // --- helper methods ---
 
     private String extractUserRole(String authHeader) {
         String token = extractToken(authHeader);

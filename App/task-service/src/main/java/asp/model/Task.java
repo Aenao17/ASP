@@ -1,63 +1,103 @@
 package asp.model;
 
-import jakarta.persistence.*;
-import lombok.*;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@Getter
-@Setter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-@Table(name = "tasks")
-public class Task implements Serializable {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class Task {
     private int id;
-    @Column(name = "title", unique = true)
     private String title;
-    @Column(name = "description")
     private String description;
-    @Column(name = "status")
     private Status status;
-    @Column(name = "owner_id")
-    private String ownerId;
-    @ElementCollection
-    private List<String> volunteers;
-    @ElementCollection
-    private List<Integer> subTasks;
-    @Column(name = "created_at")
+    private Integer ownerId;
     private String createdAt;
-    @Column(name = "deadline")
     private String deadline;
-    public Task(String title, String description, Status status, String ownerId, List<String> volunteers, List<Integer> subTasks, String createdAt, String deadline) {
+    private List<Integer> volunteers;
+    private List<Integer> subTasks;
+
+    public Task() {
+    }
+
+    public Task(int id, String title, String description, Status status, Integer ownerId, String createdAt, String deadline) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
         this.ownerId = ownerId;
-        this.volunteers = volunteers;
-        this.subTasks = subTasks;
         this.createdAt = createdAt;
+        this.deadline = deadline;
+        this.volunteers = new ArrayList<>();
+        this.subTasks = new ArrayList<>();
+    }
+    
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public Integer getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Integer ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public String getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(String deadline) {
         this.deadline = deadline;
     }
 
-    @Override
-    public String toString() {
-        return "Task{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                ", ownerId='" + ownerId + '\'' +
-                ", volunteers=" + volunteers +
-                ", subTasks=" + subTasks +
-                ", createdAt=" + createdAt +
-                ", deadline=" + deadline +
-                '}';
+    public List<Integer> getVolunteers() {
+        return volunteers;
+    }
+
+    public void setVolunteers(List<Integer> volunteers) {
+        this.volunteers = volunteers;
+    }
+
+    public List<Integer> getSubTasks() {
+        return subTasks;
+    }
+
+    public void setSubTasks(List<Integer> subTasks) {
+        this.subTasks = subTasks;
     }
 }
