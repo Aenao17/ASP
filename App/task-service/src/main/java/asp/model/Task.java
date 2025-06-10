@@ -11,7 +11,7 @@ public class Task {
     private Integer ownerId;
     private String createdAt;
     private String deadline;
-    private List<Integer> volunteers;
+    private List<String> volunteers;
     private List<Integer> subTasks;
 
     public Task() {
@@ -85,11 +85,11 @@ public class Task {
         this.deadline = deadline;
     }
 
-    public List<Integer> getVolunteers() {
+    public List<String> getVolunteers() {
         return volunteers;
     }
 
-    public void setVolunteers(List<Integer> volunteers) {
+    public void setVolunteers(List<String> volunteers) {
         this.volunteers = volunteers;
     }
 

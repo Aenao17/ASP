@@ -70,6 +70,9 @@ export class VolunteersPage implements OnInit {
 
   async saveVolunteer() {
     try {
+      //take only first 10 characters of birthday
+      this.selectedVolunteer.birthday = this.selectedVolunteer.birthday.substring(0, 10).split('-').reverse().join('-');
+
       await this.volunteerS.updateVolunteer(this.selectedVolunteer.username, this.selectedVolunteer);
       this.isEditModalOpen = false;
       this.getVolunteers();

@@ -2,26 +2,48 @@
   <div class="volunteer-container">
     <h1>VOLUNTEERS DASHBOARD</h1>
 
-    <ion-list>
-      <ion-card *ngFor="let volunteer of volunteers" class="volunteer-card">
-        <ion-card-content>
-          <h2>{{ volunteer.firstName }} {{ volunteer.lastName }} ({{ volunteer.username }})</h2>
-          <p><strong>Email:</strong> {{ volunteer.email }}</p>
-          <p><strong>Institutional Email:</strong> {{ volunteer.institutionalEmail }}</p>
-          <p><strong>Phone:</strong> {{ volunteer.phoneNumber }}</p>
-          <p><strong>Birthday:</strong> {{ volunteer.birthday }}</p>
-          <p><strong>Department:</strong> {{ volunteer.departament }}</p>
-          <p><strong>Points:</strong> {{ volunteer.points }}</p>
+    <!-- Table view for volunteers -->
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <table class="volunteer-table">
+            <thead>
+            <tr>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Institutional Email</th>
+              <th>Phone</th>
+              <th>Birthday</th>
+              <th>Department</th>
+              <th>Points</th>
+              <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let volunteer of volunteers">
+              <td>{{ volunteer.firstName }}</td>
+              <td>{{ volunteer.lastName }}</td>
+              <td>{{ volunteer.username }}</td>
+              <td>{{ volunteer.email }}</td>
+              <td>{{ volunteer.institutionalEmail }}</td>
+              <td>{{ volunteer.phoneNumber }}</td>
+              <td>{{ volunteer.birthday }}</td>
+              <td>{{ volunteer.departament }}</td>
+              <td>{{ volunteer.points }}</td>
+              <td class="action-cell">
+                <ion-button size="small" color="warning" (click)="editVolunteer(volunteer)">Edit</ion-button>
+                <ion-button size="small" color="danger" (click)="deleteVolunteer(volunteer.username)">Delete</ion-button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
 
-          <div class="action-buttons">
-            <ion-button color="warning" (click)="editVolunteer(volunteer)">Edit</ion-button>
-            <ion-button color="danger" (click)="deleteVolunteer(volunteer.username)">Delete</ion-button>
-          </div>
-        </ion-card-content>
-      </ion-card>
-    </ion-list>
-
-
+    <!-- Add Volunteer Form -->
     <ion-button expand="full" (click)="toggleAddForm()">
       {{ isAddFormOpen ? 'Hide Add Volunteer' : 'Add Volunteer' }}
     </ion-button>
@@ -64,44 +86,44 @@
         <ion-button expand="block" class="submit-button" (click)="addVolunteer()">✨ Add Volunteer ✨</ion-button>
       </ion-card-content>
     </ion-card>
-  </div>
 
-  <!-- Edit Modal -->
-  <ion-modal [isOpen]="isEditModalOpen" (ionModalDidDismiss)="closeEditModal()">
-    <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>Edit Volunteer</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="closeEditModal()">Close</ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content>
-        <ion-list>
-          <ion-item>
-            <ion-label position="stacked">Points</ion-label>
-            <ion-input type="number" [(ngModel)]="selectedVolunteer.points"></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="stacked">Birthday</ion-label>
-            <ion-datetime
-              display-format="YYYY-MM-DD"
-              [(ngModel)]="selectedVolunteer.birthday">
-            </ion-datetime>
-          </ion-item>
-          <ion-item>
-            <ion-label position="stacked">Department</ion-label>
-            <ion-select [(ngModel)]="selectedVolunteer.departament">
-              <ion-select-option value="HR">HR</ion-select-option>
-              <ion-select-option value="EVENTS">EVENTS</ion-select-option>
-              <ion-select-option value="EXTERNE">EXTERNE</ion-select-option>
-              <ion-select-option value="IMPR">IMPR</ion-select-option>
-            </ion-select>
-          </ion-item>
-        </ion-list>
-        <ion-button expand="full" (click)="saveVolunteer()">Save</ion-button>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
+    <!-- Edit Modal -->
+    <ion-modal [isOpen]="isEditModalOpen" (ionModalDidDismiss)="closeEditModal()">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Edit Volunteer</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="closeEditModal()">Close</ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content>
+          <ion-list>
+            <ion-item>
+              <ion-label position="stacked">Points</ion-label>
+              <ion-input type="number" [ngModel]="selectedVolunteer.points"></ion-input>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">Birthday</ion-label>
+              <ion-datetime
+                display-format="YYYY-MM-DD"
+                [(ngModel)]="selectedVolunteer.birthday">
+              </ion-datetime>
+            </ion-item>
+            <ion-item>
+              <ion-label position="stacked">Department</ion-label>
+              <ion-select [(ngModel)]="selectedVolunteer.departament">
+                <ion-select-option value="HR">HR</ion-select-option>
+                <ion-select-option value="EVENTS">EVENTS</ion-select-option>
+                <ion-select-option value="EXTERNE">EXTERNE</ion-select-option>
+                <ion-select-option value="IMPR">IMPR</ion-select-option>
+              </ion-select>
+            </ion-item>
+          </ion-list>
+          <ion-button expand="full" (click)="saveVolunteer()">Save</ion-button>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+  </div>
 </ion-content>

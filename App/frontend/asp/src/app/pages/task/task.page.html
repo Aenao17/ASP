@@ -52,6 +52,7 @@
         <p>Owner: {{ t.ownerId }}</p>
         <p>Deadline: {{ t.deadline | date:'short' }}</p>
       </ion-label>
+      <ion-button fill="clear" slot="end" (click)="takeTask(t)">Take task</ion-button>
     </ion-item>
   </ion-list>
 

@@ -33,8 +33,21 @@ export class TaskService {
     try {
       return await lastValueFrom(this.http.post(`${this.apiUrl}`, taskData));
     } catch (error: any) {
-      console.error('Error creating task:', error);
-      throw error;
+      if(error.status ==401) {
+        console.error('Error creating task:', error);
+        throw error;
+      }
+    }
+  }
+
+  async assignTask(taskId: number, volunteerId: string): Promise<any> {
+    try{
+      await lastValueFrom(this.http.put(`${this.apiUrl}`, { taskId, volunteerId }));
+    }catch (error: any) {
+      if(error.status ==401) {
+        console.error('Error assigning task:', error);
+        throw error;
+      }
     }
   }
 }

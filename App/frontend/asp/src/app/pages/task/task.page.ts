@@ -3,6 +3,7 @@ import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {TaskService} from "../../services/task.service";
 import {AuthService} from "../../services/auth.service";
 interface Task {
+  id: number;
   title: string;
   description: string;
   status: string;
@@ -44,12 +45,32 @@ export class TaskPage implements OnInit {
     this.getUserRole();
   }
 
+  async takeTask(task: Task) {
+    this.loading = true;
+    this.error = null;
+    try {
+      const username = await this.auth.getUsername();
+      await this.taskService.assignTask(task.id, username); // Assuming "1" is the current user's ID
+      console.log('Task taken:', task);
+      this.loadTasks();
+    } catch (err: any) {
+      if(err.status === 401) {
+        this.error = 'Failed to take task.';
+        console.error(err);
+      }
+    } finally {
+      this.loading = false;
+    }
+  }
+
   async getUserRole(): Promise<void> {
     try {
       this.userRole = await this.auth.getUserRole();
+      console.log('User role:', this.userRole);
     }catch (err:any){
       if(err.status==200){
         this.userRole = err.error.text;
+        console.log('User role:', this.userRole);
       }
     }
   }
@@ -94,7 +115,7 @@ export class TaskPage implements OnInit {
       if(err.status === 401) {
       this.error = 'Failed to create task.';
       console.error(err);
-        }
+      }
     } finally {
       this.loading = false;
       this.loadTasks();

@@ -9,6 +9,23 @@
   details {
     background-color: #fff;
   }
+  .volunteer-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .volunteer-table th,
+  .volunteer-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  .volunteer-table th {
+    background-color: var(--ion-color-light);
+    font-weight: bold;
+  }
+  .action-cell ion-button {
+    margin-right: 4px;
+  }
 
   ion-card {
     background-color: #fff !important;

@@ -26,7 +26,7 @@ public class DAO {
         String sql2 = """
     CREATE TABLE IF NOT EXISTS volunteers_tasks (
         taskId INTEGER NOT NULL,
-        volunteerId INTEGER NOT NULL,
+        volunteerId TEXT NOT NULL,
         FOREIGN KEY (taskId) REFERENCES tasks(id) ON DELETE CASCADE,
         FOREIGN KEY (volunteerId) REFERENCES volunteers(id) ON DELETE CASCADE
     );
@@ -83,11 +83,10 @@ public class DAO {
 
             while (rs2.next()) {
                 int taskId = rs2.getInt("taskId");
-                int volunteerId = rs2.getInt("volunteerId");
-
+                String volunteerId = rs2.getString("volunteerId");
                 for(Task task : tasks) {
                     if(task.getId() == taskId) {
-                        List<Integer> volunteers = task.getVolunteers();
+                        List<String> volunteers = task.getVolunteers();
                         if (!volunteers.contains(volunteerId)) {
                             volunteers.add(volunteerId);
                         }
@@ -130,6 +129,18 @@ public class DAO {
             pstmt.setObject(4, task.getOwnerId());
             pstmt.setString(5, task.getCreatedAt());
             pstmt.setString(6, task.getDeadline());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void assignTaskToUser(int taskId, String username) {
+        String sql = "INSERT INTO volunteers_tasks (taskId, volunteerId) VALUES (?, ?)";
+        try (Connection conn = DBUtils.getConnection();
+             var pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, taskId);
+            pstmt.setString(2, username);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());

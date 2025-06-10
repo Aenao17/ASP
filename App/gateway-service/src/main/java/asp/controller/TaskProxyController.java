@@ -73,10 +73,45 @@ public class TaskProxyController {
         return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
     }
 
+    @PutMapping
+    public ResponseEntity<String> updateTask(
+            @RequestBody String taskJson,
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        String role = extractUserRole(authHeader);
+        if (!isAllowedForPut(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Access denied: only CD, ADMIN, or ADMINISTRATOR can update tasks.");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", authHeader);
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(taskJson, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                taskServiceUrl + "/api/tasks",
+                HttpMethod.PUT,
+                requestEntity,
+                String.class
+        );
+
+        return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+    }
+
     private String extractUserRole(String authHeader) {
         String token = extractToken(authHeader);
         Claims claims = jwtService.extractAllClaims(token);
         return claims.get("role", String.class);
+    }
+
+    private boolean isAllowedForPut(String role) {
+        return "ADMINISTRATOR".equals(role)
+                || "ADMIN".equals(role)
+                || "CD".equals(role)
+                || "PM".equals(role)
+        || "VOLUNTEER".equals(role);
     }
 
     private String extractToken(String authHeader) {
@@ -90,7 +125,8 @@ public class TaskProxyController {
         return "ADMINISTRATOR".equals(role)
                 || "ADMIN".equals(role)
                 || "CD".equals(role)
-                || "PM".equals(role);
+                || "PM".equals(role)
+                || "VOLUNTEER".equals(role);
     }
 
     private boolean isAllowedForPost(String role) {

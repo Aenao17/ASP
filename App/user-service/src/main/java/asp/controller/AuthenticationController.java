@@ -39,9 +39,8 @@ public class AuthenticationController {
 
     @Operation(summary = "Get rol utilizator")
     @GetMapping("/role")
-    public ResponseEntity<String> getUserRole(
-            Authentication authentication) {
-        String role = authService.getUserRole(authentication);
+    public ResponseEntity<String> getUserRole(@RequestBody String token) {
+        String role = authService.getUserRole(token);
         return ResponseEntity.ok(role);
     }
 

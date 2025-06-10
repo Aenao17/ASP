@@ -40,7 +40,7 @@ public class TasksController implements HttpHandler {
                 e.printStackTrace();
             }
         } else if (method.equals("PUT")) {
-            //handlePut(exchange);
+            handlePut(exchange);
         } else if (method.equals("DELETE")) {
             //handleDelete(exchange);
         }
@@ -75,6 +75,28 @@ public class TasksController implements HttpHandler {
             os.close();
         } catch (IOException e) {
             exchange.sendResponseHeaders(500, -1); // Internal Server Error
+        }
+    }
+
+    private void handlePut(com.sun.net.httpserver.HttpExchange exchange) {
+        InputStream is = exchange.getRequestBody();
+        try{
+            String requestBody = new String(is.readAllBytes());
+            int taskId =Integer.parseInt(requestBody.split(",")[0].split(":")[1]);
+            String volunteer  = requestBody.split(",")[1].split(":")[1].split("\"")[1];
+            Dao.assignTaskToUser(taskId, volunteer);
+            String response = "{Task updated successfully}";
+            exchange.sendResponseHeaders(200, response.length());
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            try {
+                exchange.sendResponseHeaders(500, -1); // Internal Server Error
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
         }
     }
 }

@@ -75,8 +75,8 @@ public class AuthenticationService {
         return tokenRepository.save(token);
     }
 
-    public String getUserRole(Authentication authentication) {
-        String username = authentication.getName();
+    public String getUserRole(String authentication) {
+        String username = jwtService.extractUsername(authentication.split(" ")[1]);
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return user.getRole().name();
