@@ -1,7 +1,23 @@
 spring:
-  data:
-    mongodb:
-      uri: mongodb://aenao:1707@localhost:27017
-      database: office_db
+  application:
+    name: App
+  profiles:
+    active:
+      - database
+
+springdoc.swagger-ui.enable: true
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
 server:
-  port: 8083
+  port: 8084
+
+
+application:
+  security:
+    jwt:
+      secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      expiration: 2592000000
