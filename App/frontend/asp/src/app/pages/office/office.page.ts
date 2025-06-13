@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ActionSheetController } from '@ionic/angular';
 import { OfficeService } from '../../services/office.service';
 
 @Component({
@@ -20,7 +20,8 @@ export class OfficePage implements OnInit {
 
   constructor(
     private officeS: OfficeService,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private actionSheetCtrl: ActionSheetController
   ) {}
 
   ngOnInit() {
@@ -75,6 +76,38 @@ export class OfficePage implements OnInit {
   }
   get hasItems(): boolean {
     return !!this.currentStorageUnit?.items?.length;
+  }
+
+  /** show the action sheet with all four actions */
+  async presentActionSheet() {
+    const sheet = await this.actionSheetCtrl.create({
+      header: 'Actions',
+      buttons: [
+        {
+          text: '+ Add Item',
+          icon: 'add',
+          handler: () => this.promptNewItem()
+        },
+        {
+          text: '+ Add Storage Unit',
+          icon: 'folder-open',
+          handler: () => this.promptNewStorageUnit()
+        },
+        {
+          text: '↺ Rename Current Unit',
+          icon: 'pencil',
+          handler: () => this.promptRenameStorageUnit()
+        },
+        {
+          text: '- Delete Current Unit',
+          icon: 'trash',
+          role: 'destructive',
+          handler: () => this.confirmDelete()
+        },
+        { text: 'Cancel', icon: 'close', role: 'cancel' }
+      ]
+    });
+    await sheet.present();
   }
 
   // SEARCH
@@ -180,7 +213,7 @@ export class OfficePage implements OnInit {
     }
   }
 
-  // ===== EDIT ITEM QUANTITY =====
+  // EDIT ITEM
   async promptEditItem(item: any) {
     const alert = await this.alertCtrl.create({
       header: 'Edit Quantity',
@@ -219,7 +252,7 @@ export class OfficePage implements OnInit {
     }
   }
 
-  // ===== DELETE ITEM =====
+  // DELETE ITEM
   async confirmDeleteItem(item: any) {
     const alert = await this.alertCtrl.create({
       header: 'Delete Item',
@@ -246,7 +279,7 @@ export class OfficePage implements OnInit {
     }
   }
 
-  // ===== DELETE CURRENT UNIT =====
+  // DELETE STORAGE UNIT
   async confirmDelete() {
     const alert = await this.alertCtrl.create({
       header: 'Delete Storage Unit',
@@ -268,12 +301,9 @@ export class OfficePage implements OnInit {
     }
   }
 
-  // ===== RENAME CURRENT UNIT =====
-  /** Prompt user for a new name */
+  // RENAME STORAGE UNIT
   async promptRenameStorageUnit() {
-    if (!this.currentStorageUnit) {
-      return;
-    }
+    if (!this.currentStorageUnit) return;
 
     const alert = await this.alertCtrl.create({
       header: 'Rename Storage Unit',
@@ -302,7 +332,6 @@ export class OfficePage implements OnInit {
     await alert.present();
   }
 
-  /** Call service and refresh */
   private async renameStorageUnit(id: number, newName: string) {
     try {
       await this.officeS.renameStorageUnit(id, newName);

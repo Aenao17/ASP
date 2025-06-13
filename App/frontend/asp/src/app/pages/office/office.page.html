@@ -1,6 +1,12 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Office Inventory</ion-title>
+    <!-- only show the “more” button when in detail view -->
+    <ion-buttons slot="end" *ngIf="!isRootView">
+      <ion-button (click)="presentActionSheet()">
+        <ion-icon slot="icon-only" name="ellipsis-vertical-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -85,21 +91,7 @@
         </ion-item-sliding>
       </ion-list>
 
-      <ion-button expand="block" (click)="promptNewStorageUnit()">
-        + Add Storage Unit
-      </ion-button>
-
-      <!-- Rename button -->
-      <ion-button expand="block" color="tertiary" (click)="promptRenameStorageUnit()">
-        ↺ Rename Current Unit
-      </ion-button>
-
-      <ion-button expand="block" color="danger" (click)="confirmDelete()">
-        - Delete Current Unit
-      </ion-button>
-      <ion-button expand="block" (click)="promptNewItem()">
-        + Add Item
-      </ion-button>
+      <!-- back button remains visible -->
       <ion-button expand="block" (click)="goBack()">
         ← Back
       </ion-button>
