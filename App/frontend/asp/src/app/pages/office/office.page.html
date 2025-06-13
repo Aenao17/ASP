@@ -21,7 +21,7 @@
       <ion-item *ngFor="let item of searchResults">
         <ion-label>
           <h3>{{ item.name }} ({{ item.quantity }})</h3>
-          <p *ngIf="item.location">{{ item.location }}</p>
+          <p *ngIf="item.location">Location: {{ item.location }}</p>
         </ion-label>
       </ion-item>
     </ion-list>

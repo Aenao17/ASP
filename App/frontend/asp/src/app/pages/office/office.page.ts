@@ -78,7 +78,19 @@ export class OfficePage implements OnInit {
     this.searchInProgress = true;
     try {
       // backend does case‐insensitive search
-      this.searchResults = await this.officeS.getItemByName(q);
+      let results = await this.officeS.getItemByName(q);
+      for (let item of results) {
+        let location="";
+        let parentUnit = await this.officeS.getStorageUnitById(item.parent);
+        location = location + parentUnit.name + " / ";
+        while(parentUnit.parent !=null){
+          console.log("parentUnit", parentUnit);
+          parentUnit = await this.officeS.getStorageUnitById(parentUnit.parent.id);
+          location = parentUnit.name + " / " + location;
+        }
+        item.location = location.substring(0, location.length - 3); // remove trailing " / "
+      }
+      this.searchResults = results;
     } catch (err) {
       console.error('Search error', err);
       this.searchResults = [];
