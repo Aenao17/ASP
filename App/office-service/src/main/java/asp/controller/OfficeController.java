@@ -3,7 +3,6 @@ package asp.controller;
 import asp.model.InventoryItem;
 import asp.model.StorageUnit;
 import asp.service.InventoryService;
-import com.electronwill.nightconfig.core.conversion.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -50,9 +49,7 @@ public class OfficeController {
 
     @PutMapping("/storage-unit/{id}/name")
     public ResponseEntity<StorageUnit> updateUnitName(@PathVariable Integer id, @RequestBody String newName) {
-        StorageUnit unit = inventoryService.getUnitById(id);
-        unit.setName(newName);
-        return ResponseEntity.ok(inventoryService.updateUnit(unit));
+        return ResponseEntity.ok(inventoryService.updateStorageName(id, newName));
     }
 
     @GetMapping("/items/{id}")

@@ -89,15 +89,15 @@ public class OfficeProxyController {
     }
 
     @PutMapping("/storage-unit/{id}/name")
-    public ResponseEntity<StorageUnitDto> updateUnitName(
+    public ResponseEntity<Object> updateUnitName(
             @PathVariable Integer id,
             @RequestBody String newName,
             @RequestHeader("Authorization") String auth
     ) {
         HttpEntity<String> req = new HttpEntity<>(newName, headers(auth));
-        ResponseEntity<StorageUnitDto> resp = restTemplate.exchange(
+        ResponseEntity<Object> resp = restTemplate.exchange(
                 officeServiceUrl + "/api/office/storage-unit/" + id + "/name",
-                HttpMethod.PUT, req, StorageUnitDto.class
+                HttpMethod.PUT, req, Object.class
         );
         return ResponseEntity.status(resp.getStatusCode()).body(resp.getBody());
     }

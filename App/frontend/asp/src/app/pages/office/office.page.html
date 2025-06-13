@@ -1,4 +1,3 @@
-<!-- src/app/office/office.page.html -->
 <ion-header>
   <ion-toolbar>
     <ion-title>Office Inventory</ion-title>
@@ -89,7 +88,13 @@
       <ion-button expand="block" (click)="promptNewStorageUnit()">
         + Add Storage Unit
       </ion-button>
-      <ion-button expand="block" (click)="confirmDelete()">
+
+      <!-- Rename button -->
+      <ion-button expand="block" color="tertiary" (click)="promptRenameStorageUnit()">
+        ↺ Rename Current Unit
+      </ion-button>
+
+      <ion-button expand="block" color="danger" (click)="confirmDelete()">
         - Delete Current Unit
       </ion-button>
       <ion-button expand="block" (click)="promptNewItem()">

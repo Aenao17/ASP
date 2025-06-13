@@ -101,7 +101,7 @@ export class OfficeService {
   async renameStorageUnit(id: number, newName: string) {
     const body = newName;
     try {
-      return await this.http.put(`${this.apiUrl}/storage-unit/${id}`, body).toPromise();
+      return await this.http.put(`${this.apiUrl}/storage-unit/${id}/name`, body).toPromise();
     } catch (error: any) {
       console.error(`Error renaming storage unit with ID ${id}:`, error);
       throw error;

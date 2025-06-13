@@ -51,6 +51,14 @@ public class InventoryService {
         return item;
     }
 
+    public StorageUnit updateStorageName(Integer unitId, String newName) {
+        StorageUnit unit = suRepo.findById(unitId)
+                .orElseThrow(() -> new EntityNotFoundException("Unit not found"));
+        unit.setName(newName);
+        suRepo.save(unit);
+        return unit;
+    }
+
     public InventoryItem updateQuantity(Integer itemId, int newQty) {
         InventoryItem it = itemRepo.findById(itemId)
                 .orElseThrow(() -> new EntityNotFoundException("Item not found"));

@@ -1,4 +1,3 @@
-// src/app/office/office.page.ts
 import { Component, OnInit } from '@angular/core';
 import { AlertController } from '@ionic/angular';
 import { OfficeService } from '../../services/office.service';
@@ -266,6 +265,51 @@ export class OfficePage implements OnInit {
       this.goBack();
     } catch (error) {
       console.error('Error deleting storage unit', error);
+    }
+  }
+
+  // ===== RENAME CURRENT UNIT =====
+  /** Prompt user for a new name */
+  async promptRenameStorageUnit() {
+    if (!this.currentStorageUnit) {
+      return;
+    }
+
+    const alert = await this.alertCtrl.create({
+      header: 'Rename Storage Unit',
+      inputs: [
+        {
+          name: 'name',
+          type: 'text',
+          value: this.currentStorageUnit.name,
+          placeholder: 'New storage unit name'
+        }
+      ],
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Save',
+          handler: async data => {
+            const newName = (data.name || '').trim();
+            if (newName && newName !== this.currentStorageUnit!.name) {
+              await this.renameStorageUnit(this.currentStorageUnit!.id, newName);
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  /** Call service and refresh */
+  private async renameStorageUnit(id: number, newName: string) {
+    try {
+      await this.officeS.renameStorageUnit(id, newName);
+      await this.displayStorageUnitDetails(id);
+      this.history.pop();
+    } catch (error) {
+      console.error(`Error renaming storage unit ${id}:`, error);
     }
   }
 }
