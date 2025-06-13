@@ -86,4 +86,22 @@ public class InventoryService {
                 .orElseThrow(() -> new EntityNotFoundException("Unit not found"));
         return su.getItems();
     }
+
+    public void deleteItem(Integer itemId) {
+        InventoryItem item = itemRepo.findById(itemId)
+                .orElseThrow(() -> new EntityNotFoundException("Item not found"));
+        StorageUnit parent = item.getParent();
+        if (parent != null) {
+            parent.getItems().remove(item);
+            suRepo.save(parent);
+        }
+        itemRepo.delete(item);
+    }
+
+    public void renameStorageUnit(Integer unitId, String newName) {
+        StorageUnit unit = suRepo.findById(unitId)
+                .orElseThrow(() -> new EntityNotFoundException("Unit not found"));
+        unit.setName(newName);
+        suRepo.save(unit);
+    }
 }

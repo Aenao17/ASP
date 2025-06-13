@@ -42,10 +42,17 @@ public class OfficeController {
     }
 
     @PutMapping("/item/{id}/quantity")
-    public ResponseEntity<?> updateItemQuantity(@PathVariable Integer id, @RequestParam int newQty) {
+    public ResponseEntity<?> updateItemQuantity(@PathVariable Integer id, @RequestBody Integer newQty) {
         return ResponseEntity.ok(
                 inventoryService.updateQuantity(id, newQty)
         );
+    }
+
+    @PutMapping("/storage-unit/{id}/name")
+    public ResponseEntity<StorageUnit> updateUnitName(@PathVariable Integer id, @RequestBody String newName) {
+        StorageUnit unit = inventoryService.getUnitById(id);
+        unit.setName(newName);
+        return ResponseEntity.ok(inventoryService.updateUnit(unit));
     }
 
     @GetMapping("/items/{id}")
@@ -64,6 +71,12 @@ public class OfficeController {
     public ResponseEntity<StorageUnit> getRootUnit() {
         StorageUnit root = inventoryService.getRoot();
         return ResponseEntity.ok(root);
+    }
+
+    @DeleteMapping("/item/{id}")
+    public ResponseEntity<Void> deleteItem(@PathVariable Integer id) {
+        inventoryService.deleteItem(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/items")

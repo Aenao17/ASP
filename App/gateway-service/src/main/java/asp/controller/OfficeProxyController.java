@@ -47,6 +47,19 @@ public class OfficeProxyController {
         return ResponseEntity.status(resp.getStatusCode()).body(resp.getBody());
     }
 
+    @DeleteMapping("item/{id}")
+    public ResponseEntity<Void> deleteItem(
+            @PathVariable Integer id,
+            @RequestHeader("Authorization") String auth
+    ) {
+        HttpEntity<Void> req = new HttpEntity<>(headers(auth));
+        restTemplate.exchange(
+                officeServiceUrl + "/api/office/item/" + id,
+                HttpMethod.DELETE, req, Void.class
+        );
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/storage-unit/{id}/item")
     public ResponseEntity<InventoryItemDto> addItem(
             @PathVariable Integer id,
@@ -61,6 +74,35 @@ public class OfficeProxyController {
         return ResponseEntity.status(resp.getStatusCode()).body(resp.getBody());
     }
 
+    @PutMapping("/item/{id}/quantity")
+    public ResponseEntity<Object> updateItemQuantity(
+            @PathVariable Integer id,
+            @RequestBody Integer newQty,
+            @RequestHeader("Authorization") String auth
+    ) {
+        HttpEntity<Integer> req = new HttpEntity<>(newQty, headers(auth));
+        ResponseEntity<Object> resp = restTemplate.exchange(
+                officeServiceUrl + "/api/office/item/" + id + "/quantity",
+                HttpMethod.PUT, req, Object.class
+        );
+        return ResponseEntity.status(resp.getStatusCode()).body(resp.getBody());
+    }
+
+    @PutMapping("/storage-unit/{id}/name")
+    public ResponseEntity<StorageUnitDto> updateUnitName(
+            @PathVariable Integer id,
+            @RequestBody String newName,
+            @RequestHeader("Authorization") String auth
+    ) {
+        HttpEntity<String> req = new HttpEntity<>(newName, headers(auth));
+        ResponseEntity<StorageUnitDto> resp = restTemplate.exchange(
+                officeServiceUrl + "/api/office/storage-unit/" + id + "/name",
+                HttpMethod.PUT, req, StorageUnitDto.class
+        );
+        return ResponseEntity.status(resp.getStatusCode()).body(resp.getBody());
+    }
+
+
     @DeleteMapping("/storage-unit/{id}")
     public ResponseEntity<Void> deleteUnit(
             @PathVariable Integer id,
@@ -73,21 +115,6 @@ public class OfficeProxyController {
         );
         return ResponseEntity.noContent().build();
     }
-
-    @PutMapping("/item/{id}/quantity")
-    public ResponseEntity<InventoryItemDto> updateItemQuantity(
-            @PathVariable Integer id,
-            @RequestParam int newQty,
-            @RequestHeader("Authorization") String auth
-    ) {
-        HttpEntity<Void> req = new HttpEntity<>(headers(auth));
-        ResponseEntity<InventoryItemDto> resp = restTemplate.exchange(
-                officeServiceUrl + "/api/office/item/" + id + "/quantity?newQty=" + newQty,
-                HttpMethod.PUT, req, InventoryItemDto.class
-        );
-        return ResponseEntity.status(resp.getStatusCode()).body(resp.getBody());
-    }
-
     @GetMapping("/items/{id}")
     public ResponseEntity<List<InventoryItemDto>> getItemsInUnit(
             @PathVariable Integer id,

@@ -67,23 +67,33 @@
         </ion-item>
       </ion-list>
 
+      <!-- ITEMS WITH SLIDE OPTIONS -->
       <ion-list *ngIf="hasItems">
-        <ion-item *ngFor="let item of currentStorageUnit.items">
-          <ion-label>
-            <h3>{{ item.name }} ({{ item.quantity }})</h3>
-          </ion-label>
-        </ion-item>
+        <ion-item-sliding *ngFor="let item of currentStorageUnit.items">
+          <ion-item>
+            <ion-label>
+              <h3>{{ item.name }} ({{ item.quantity }})</h3>
+            </ion-label>
+          </ion-item>
+          <ion-item-options side="end">
+            <ion-item-option color="primary" (click)="promptEditItem(item)">
+              Edit
+            </ion-item-option>
+            <ion-item-option color="danger" (click)="confirmDeleteItem(item)">
+              Delete
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
       </ion-list>
 
       <ion-button expand="block" (click)="promptNewStorageUnit()">
         + Add Storage Unit
       </ion-button>
-
+      <ion-button expand="block" (click)="confirmDelete()">
+        - Delete Current Unit
+      </ion-button>
       <ion-button expand="block" (click)="promptNewItem()">
         + Add Item
-      </ion-button>
-      <ion-button expand="block" (click)="deleteCurrentUnit()">
-        - Delete Current Unit
       </ion-button>
       <ion-button expand="block" (click)="goBack()">
         ← Back

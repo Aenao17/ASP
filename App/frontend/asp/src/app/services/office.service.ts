@@ -78,4 +78,33 @@ export class OfficeService {
       throw error;
     }
   }
+
+  async deleteItem(id:number){
+    try {
+      return await this.http.delete(`${this.apiUrl}/item/${id}`).toPromise();
+    } catch (error: any) {
+      console.error(`Error deleting item with ID ${id}:`, error);
+      throw error;
+    }
+  }
+
+  async updateItemQuantity(id: number, quantity: number) {
+    const body =  quantity;
+    try {
+      return await this.http.put(`${this.apiUrl}/item/${id}/quantity`,body).toPromise();
+    } catch (error: any) {
+      console.error(`Error updating item quantity for ID ${id}:`, error);
+      throw error;
+    }
+  }
+
+  async renameStorageUnit(id: number, newName: string) {
+    const body = newName;
+    try {
+      return await this.http.put(`${this.apiUrl}/storage-unit/${id}`, body).toPromise();
+    } catch (error: any) {
+      console.error(`Error renaming storage unit with ID ${id}:`, error);
+      throw error;
+    }
+  }
 }
