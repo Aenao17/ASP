@@ -45,7 +45,6 @@ export class OfficePage implements OnInit {
         console.error(`No data for unit ${unitId}`);
         return;
       }
-      // push the *ID* of the previous unit (or null for root)
       this.history.push(this.currentStorageUnit ? this.currentStorageUnit.id : null);
       this.currentStorageUnit = details;
     } catch (err) {
@@ -58,10 +57,8 @@ export class OfficePage implements OnInit {
     if (this.history.length > 0) {
       const prevId = this.history.pop()!;
       if (prevId === null) {
-        // back to root
         await this.loadRootList();
       } else {
-        // reload that unit afresh
         try {
           this.currentStorageUnit = await this.officeS.getStorageUnitById(prevId);
         } catch (err) {
@@ -69,7 +66,6 @@ export class OfficePage implements OnInit {
         }
       }
     } else {
-      // nothing in history → root
       await this.loadRootList();
     }
   }
@@ -150,11 +146,76 @@ export class OfficePage implements OnInit {
     try {
       const body = { name, parentId };
       const newUnit = await this.officeS.createStorageUnit(body);
-      // reload the parent so the new sub-unit appears
       await this.displayStorageUnitDetails(parentId);
       this.history.pop();
     } catch (err) {
       console.error('Failed to create storage unit', err);
+    }
+  }
+
+  // ADD NEW ITEM
+  async promptNewItem() {
+    const parent = this.currentStorageUnit;
+    if (!parent) {
+      console.warn('Cannot add an item at root level');
+      return;
+    }
+
+    const alert = await this.alertCtrl.create({
+      header: 'New Item',
+      inputs: [
+        { name: 'name', type: 'text', placeholder: 'Item name' },
+        { name: 'quantity', type: 'number', placeholder: 'Quantity', min: 1 }
+      ],
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Add',
+          handler: async (data) => {
+            const name = (data.name || '').trim();
+            const quantity = Number(data.quantity);
+            if (name && quantity > 0) {
+              await this.addItem(name, quantity, parent.id);
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  private async addItem(name: string, quantity: number, unitId: number) {
+    try {
+      await this.officeS.addItemToStorageUnit(unitId, name, quantity);
+      // reload current unit to show the new item
+      await this.displayStorageUnitDetails(unitId);
+      this.history.pop();
+    } catch (error) {
+      console.error(`Error adding item to storage unit ${unitId}:`, error);
+    }
+  }
+
+  async confirmDelete() {
+    const alert = await this.alertCtrl.create({
+      header: 'Delete Storage Unit',
+      message: `Are you sure you want to delete "${this.currentStorageUnit.name}"? This cannot be undone.`,
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        { text: 'Delete', role: 'destructive', handler: () => this.deleteCurrentUnit() }
+      ]
+    });
+    await alert.present();
+  }
+
+  /**
+   * Call service and navigate back on success
+   */
+  async deleteCurrentUnit() {
+    try {
+      await this.officeS.deleteStorageUnit(this.currentStorageUnit.id);
+      this.goBack();
+    } catch (error) {
+      console.error('Error deleting storage unit', error);
     }
   }
 }

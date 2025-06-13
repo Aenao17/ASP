@@ -59,4 +59,23 @@ export class OfficeService {
   async createStorageUnit(body: {name: string; parentId: number }) {
     return await this.http.post(`${this.apiUrl}/storage-unit`, body).toPromise();
   }
+
+  async addItemToStorageUnit(unitId: number, name: string, quantity: number) {
+    const body = { name, quantity };
+    try {
+      return await this.http.post(`${this.apiUrl}/storage-unit/${unitId}/item`, body).toPromise();
+    } catch (error: any) {
+      console.error(`Error adding item to storage unit ${unitId}:`, error);
+      throw error;
+    }
+  }
+
+  async deleteStorageUnit(unitId: number) {
+    try {
+      return await this.http.delete(`${this.apiUrl}/storage-unit/${unitId}`).toPromise();
+    } catch (error: any) {
+      console.error(`Error deleting storage unit ${unitId}:`, error);
+      throw error;
+    }
+  }
 }
