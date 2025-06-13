@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface StorageUnitRepository extends JpaRepository<StorageUnit,Integer> {
     Optional<StorageUnit> findByName(String name);
+    Optional<StorageUnit> findByParentIsNull();
 }
 

@@ -62,6 +62,25 @@ public class InventoryService {
         return itemRepo.findByNameContainingIgnoreCase(term);
     }
 
+    public StorageUnit getUnitById(Integer unitId) {
+        return suRepo.findById(unitId)
+                .orElseThrow(() -> new EntityNotFoundException("Unit not found"));
+    }
+
+    public List<InventoryItem> getAllItems() {
+        return itemRepo.findAll();
+    }
+
+    public List<StorageUnit> getAllUnits() {
+        return suRepo.findAll();
+    }
+
+    public StorageUnit getRoot(){
+        //return the object without a parent
+        return suRepo.findByParentIsNull()
+                .orElseThrow(() -> new EntityNotFoundException("Root unit not found"));
+    }
+
     public List<InventoryItem> getAllItemsFromUnit(Integer unitId) {
         StorageUnit su = suRepo.findById(unitId)
                 .orElseThrow(() -> new EntityNotFoundException("Unit not found"));

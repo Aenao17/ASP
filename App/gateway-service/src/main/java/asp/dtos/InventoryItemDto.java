@@ -5,15 +5,15 @@ public class InventoryItemDto {
     private Integer id;
     private String name;
     private Integer quantity;
-    private Integer parentId;
+    private Integer parent;
 
     public InventoryItemDto() {}
 
-    public InventoryItemDto(Integer id, String name, Integer quantity, Integer parentId) {
+    public InventoryItemDto(Integer id, String name, Integer quantity, Integer parent) {
         this.id = id;
         this.name = name;
         this.quantity = quantity;
-        this.parentId = parentId;
+        this.parent = parent;
     }
 
     // getters & setters
@@ -26,6 +26,6 @@ public class InventoryItemDto {
     public Integer getQuantity() { return quantity; }
     public void setQuantity(Integer quantity) { this.quantity = quantity; }
 
-    public Integer getParentId() { return parentId; }
-    public void setParentId(Integer parentId) { this.parentId = parentId; }
+    public Integer getparent() { return parent; }
+    public void setparent(Integer parent) { this.parent = parent; }
 }

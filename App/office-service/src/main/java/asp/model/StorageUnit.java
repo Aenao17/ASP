@@ -20,11 +20,11 @@ public class StorageUnit implements Component {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter
     private Integer id;
-
+    
     @Setter
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "parent_id")
     @Getter @Setter
     private StorageUnit parent;

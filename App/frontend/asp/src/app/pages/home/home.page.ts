@@ -32,8 +32,12 @@ export class HomePage {
     this.router.navigate(['/volunteers']);
   }
 
-openTaskPage() {
+  openTaskPage() {
     this.router.navigate(['/task']);
+  }
+
+  openOfficePage() {
+    this.router.navigate(['/office']);
   }
 
   logout() {

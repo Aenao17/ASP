@@ -54,6 +54,30 @@ public class OfficeController {
         return ResponseEntity.ok(items);
     }
 
+    @GetMapping("/storage-unit/{id}")
+    public ResponseEntity<StorageUnit> getUnitById(@PathVariable Integer id) {
+        StorageUnit unit = inventoryService.getUnitById(id);
+        return ResponseEntity.ok(unit);
+    }
+
+    @GetMapping("/root")
+    public ResponseEntity<StorageUnit> getRootUnit() {
+        StorageUnit root = inventoryService.getRoot();
+        return ResponseEntity.ok(root);
+    }
+
+    @GetMapping("/items")
+    public ResponseEntity<List<InventoryItem>> getAllItems() {
+        List<InventoryItem> items = inventoryService.getAllItems();
+        return ResponseEntity.ok(items);
+    }
+
+    @GetMapping("/storage-units")
+    public ResponseEntity<List<StorageUnit>> getAllUnits() {
+        List<StorageUnit> units = inventoryService.getAllUnits();
+        return ResponseEntity.ok(units);
+    }
+
     @GetMapping("items/search/{name}")
     public ResponseEntity<List<InventoryItem>> searchItems(@PathVariable String name) {
         List<InventoryItem> items = inventoryService.searchItems(name);

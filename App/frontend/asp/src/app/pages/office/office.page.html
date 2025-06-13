@@ -1,0 +1,44 @@
+<!-- src/app/office/office.page.html -->
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Office Inventory</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- ROOT VIEW -->
+  <ng-container *ngIf="isRootView">
+    <h2>Inventory</h2>
+    <ion-list>
+      <ion-item button (click)="displayStorageUnitDetails(rootStorageUnit.id)">
+        {{ rootStorageUnit.name }}
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+  <!-- DETAIL VIEW -->
+  <ng-container *ngIf="!isRootView">
+    <h2>{{ currentStorageUnit.name }}</h2>
+
+    <ion-list *ngIf="hasSubUnits">
+      <ion-item *ngFor="let sub of currentStorageUnit.subUnits" button
+                (click)="displayStorageUnitDetails(sub.id)">
+        {{ sub.name }}
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngIf="hasItems">
+      <ion-item *ngFor="let item of currentStorageUnit.items">
+        <ion-label>
+          <h3>{{ item.name }} ({{ item.quantity }})</h3>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="block" (click)="goBack()">
+      ← Back
+    </ion-button>
+  </ng-container>
+
+</ion-content>
