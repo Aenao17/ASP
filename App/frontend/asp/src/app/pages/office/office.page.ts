@@ -1,6 +1,7 @@
 // src/app/office/office.page.ts
 import { Component, OnInit } from '@angular/core';
 import { OfficeService } from '../../services/office.service';
+import { AlertController } from "@ionic/angular";
 
 @Component({
   selector: 'app-office',
@@ -11,14 +12,16 @@ import { OfficeService } from '../../services/office.service';
 export class OfficePage implements OnInit {
   rootStorageUnit: any = null;
   currentStorageUnit: any = null;
-  private history: any[] = [];
 
-  // ← NEW: for search
+  // history of IDs (null = root)
+  private history: (number | null)[] = [];
+
+  // for search
   searchQuery: string = '';
   searchResults: any[] = [];
   searchInProgress = false;
 
-  constructor(private officeS: OfficeService) {}
+  constructor(private officeS: OfficeService, private alertCtrl: AlertController) {}
 
   ngOnInit() {
     this.loadRootList();
@@ -34,6 +37,7 @@ export class OfficePage implements OnInit {
     }
   }
 
+  /** Navigate into a unit */
   async displayStorageUnitDetails(unitId: number) {
     try {
       const details = await this.officeS.getStorageUnitById(unitId);
@@ -41,18 +45,32 @@ export class OfficePage implements OnInit {
         console.error(`No data for unit ${unitId}`);
         return;
       }
-      this.history.push(this.currentStorageUnit);
+      // push the *ID* of the previous unit (or null for root)
+      this.history.push(this.currentStorageUnit ? this.currentStorageUnit.id : null);
       this.currentStorageUnit = details;
     } catch (err) {
       console.error('Error fetching details for', unitId, err);
     }
   }
 
-  goBack() {
+  /** Navigate back one level, reloading from the backend */
+  async goBack() {
     if (this.history.length > 0) {
-      this.currentStorageUnit = this.history.pop()!;
+      const prevId = this.history.pop()!;
+      if (prevId === null) {
+        // back to root
+        await this.loadRootList();
+      } else {
+        // reload that unit afresh
+        try {
+          this.currentStorageUnit = await this.officeS.getStorageUnitById(prevId);
+        } catch (err) {
+          console.error('Error reloading storage unit', prevId, err);
+        }
+      }
     } else {
-      this.loadRootList();
+      // nothing in history → root
+      await this.loadRootList();
     }
   }
 
@@ -66,29 +84,26 @@ export class OfficePage implements OnInit {
     return !!this.currentStorageUnit?.items?.length;
   }
 
-  // ← NEW: called by ion-searchbar
+  // SEARCH
   async onSearchChange(event: CustomEvent) {
     const q = (event.detail.value || '').trim();
     this.searchQuery = q;
-    if (q.length === 0) {
+    if (!q) {
       this.searchResults = [];
       return;
     }
-
     this.searchInProgress = true;
     try {
-      // backend does case‐insensitive search
-      let results = await this.officeS.getItemByName(q);
+      const results = await this.officeS.getItemByName(q);
       for (let item of results) {
-        let location="";
+        let location = '';
         let parentUnit = await this.officeS.getStorageUnitById(item.parent);
-        location = location + parentUnit.name + " / ";
-        while(parentUnit.parent !=null){
-          console.log("parentUnit", parentUnit);
+        location = parentUnit.name + ' / ';
+        while (parentUnit.parent != null) {
           parentUnit = await this.officeS.getStorageUnitById(parentUnit.parent.id);
-          location = parentUnit.name + " / " + location;
+          location = parentUnit.name + ' / ' + location;
         }
-        item.location = location.substring(0, location.length - 3); // remove trailing " / "
+        item.location = location.slice(0, -3);
       }
       this.searchResults = results;
     } catch (err) {
@@ -99,9 +114,47 @@ export class OfficePage implements OnInit {
     }
   }
 
-  // ← NEW: clear via the cancel button
   onSearchCancel() {
     this.searchQuery = '';
     this.searchResults = [];
+  }
+
+  // ADD NEW UNIT
+  async promptNewStorageUnit() {
+    const parent = this.currentStorageUnit;
+    if (!parent) {
+      console.warn('Cannot add a sub-unit at root level');
+      return;
+    }
+
+    const alert = await this.alertCtrl.create({
+      header: 'New Storage Unit',
+      inputs: [{ name: 'name', type: 'text', placeholder: 'e.g. Electronics Shelf' }],
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Create',
+          handler: async (data) => {
+            const name = (data.name || '').trim();
+            if (name) {
+              await this.createStorageUnit(name, parent.id);
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  private async createStorageUnit(name: string, parentId: number) {
+    try {
+      const body = { name, parentId };
+      const newUnit = await this.officeS.createStorageUnit(body);
+      // reload the parent so the new sub-unit appears
+      await this.displayStorageUnitDetails(parentId);
+      this.history.pop();
+    } catch (err) {
+      console.error('Failed to create storage unit', err);
+    }
   }
 }

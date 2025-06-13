@@ -35,14 +35,14 @@ public class OfficeProxyController {
     }
 
     @PostMapping("/storage-unit")
-    public ResponseEntity<StorageUnitDto> createUnit(
+    public ResponseEntity<Object> createUnit(
             @RequestBody CreateUnitDto dto,
             @RequestHeader("Authorization") String auth
     ) {
         HttpEntity<CreateUnitDto> req = new HttpEntity<>(dto, headers(auth));
-        ResponseEntity<StorageUnitDto> resp = restTemplate.exchange(
+        ResponseEntity<Object> resp = restTemplate.exchange(
                 officeServiceUrl + "/api/office/storage-unit",
-                HttpMethod.POST, req, StorageUnitDto.class
+                HttpMethod.POST, req, Object.class
         );
         return ResponseEntity.status(resp.getStatusCode()).body(resp.getBody());
     }

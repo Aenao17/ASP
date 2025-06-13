@@ -55,4 +55,8 @@ export class OfficeService {
       throw error;
     }
   }
+
+  async createStorageUnit(body: {name: string; parentId: number }) {
+    return await this.http.post(`${this.apiUrl}/storage-unit`, body).toPromise();
+  }
 }

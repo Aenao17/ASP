@@ -1,3 +1,4 @@
+<!-- src/app/office/office.page.html -->
 <ion-header>
   <ion-toolbar>
     <ion-title>Office Inventory</ion-title>
@@ -12,10 +13,9 @@
     (ionInput)="onSearchChange($event)"
     (ionCancel)="onSearchCancel()"
     showCancelButton="focus"
-    placeholder="Search all items..."
+    placeholder="Search items by name..."
   ></ion-searchbar>
 
-  <!-- SEARCH RESULTS (but do NOT hide main view) -->
   <ng-container *ngIf="searchQuery">
     <ion-list *ngIf="!searchInProgress && searchResults.length > 0">
       <ion-item *ngFor="let item of searchResults">
@@ -37,16 +37,12 @@
     ></ion-spinner>
   </ng-container>
 
-  <!-- MAIN ROOT/DETAIL VIEW (always visible) -->
   <!-- ROOT VIEW -->
   <ng-container *ngIf="isRootView">
     <ng-container *ngIf="rootStorageUnit; else loadingRoot">
       <h2>Inventory</h2>
       <ion-list>
-        <ion-item
-          button
-          (click)="displayStorageUnitDetails(rootStorageUnit.id)"
-        >
+        <ion-item button (click)="displayStorageUnitDetails(rootStorageUnit.id)">
           {{ rootStorageUnit.name }}
         </ion-item>
       </ion-list>
@@ -79,6 +75,9 @@
         </ion-item>
       </ion-list>
 
+      <ion-button expand="block" (click)="promptNewStorageUnit()">
+        + Add Storage Unit
+      </ion-button>
       <ion-button expand="block" (click)="goBack()">
         ← Back
       </ion-button>
