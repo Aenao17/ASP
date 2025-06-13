@@ -1,4 +1,3 @@
-<!-- src/app/office/office.page.html -->
 <ion-header>
   <ion-toolbar>
     <ion-title>Office Inventory</ion-title>
@@ -7,38 +6,86 @@
 
 <ion-content class="ion-padding">
 
-  <!-- ROOT VIEW -->
-  <ng-container *ngIf="isRootView">
-    <h2>Inventory</h2>
-    <ion-list>
-      <ion-item button (click)="displayStorageUnitDetails(rootStorageUnit.id)">
-        {{ rootStorageUnit.name }}
-      </ion-item>
-    </ion-list>
-  </ng-container>
+  <!-- SEARCH BAR -->
+  <ion-searchbar
+    [(ngModel)]="searchQuery"
+    (ionInput)="onSearchChange($event)"
+    (ionCancel)="onSearchCancel()"
+    showCancelButton="focus"
+    placeholder="Search all items..."
+  ></ion-searchbar>
 
-  <!-- DETAIL VIEW -->
-  <ng-container *ngIf="!isRootView">
-    <h2>{{ currentStorageUnit.name }}</h2>
-
-    <ion-list *ngIf="hasSubUnits">
-      <ion-item *ngFor="let sub of currentStorageUnit.subUnits" button
-                (click)="displayStorageUnitDetails(sub.id)">
-        {{ sub.name }}
-      </ion-item>
-    </ion-list>
-
-    <ion-list *ngIf="hasItems">
-      <ion-item *ngFor="let item of currentStorageUnit.items">
+  <!-- SEARCH RESULTS (but do NOT hide main view) -->
+  <ng-container *ngIf="searchQuery">
+    <ion-list *ngIf="!searchInProgress && searchResults.length > 0">
+      <ion-item *ngFor="let item of searchResults">
         <ion-label>
           <h3>{{ item.name }} ({{ item.quantity }})</h3>
+          <p *ngIf="item.location">{{ item.location }}</p>
         </ion-label>
       </ion-item>
     </ion-list>
 
-    <ion-button expand="block" (click)="goBack()">
-      ← Back
-    </ion-button>
+    <ion-item *ngIf="!searchInProgress && searchResults.length === 0">
+      No items found for “{{ searchQuery }}”
+    </ion-item>
+
+    <ion-spinner
+      *ngIf="searchInProgress"
+      name="dots"
+      style="display: block; margin: 1em auto;"
+    ></ion-spinner>
+  </ng-container>
+
+  <!-- MAIN ROOT/DETAIL VIEW (always visible) -->
+  <!-- ROOT VIEW -->
+  <ng-container *ngIf="isRootView">
+    <ng-container *ngIf="rootStorageUnit; else loadingRoot">
+      <h2>Inventory</h2>
+      <ion-list>
+        <ion-item
+          button
+          (click)="displayStorageUnitDetails(rootStorageUnit.id)"
+        >
+          {{ rootStorageUnit.name }}
+        </ion-item>
+      </ion-list>
+    </ng-container>
+    <ng-template #loadingRoot>
+      <ion-spinner></ion-spinner>
+    </ng-template>
+  </ng-container>
+
+  <!-- DETAIL VIEW -->
+  <ng-container *ngIf="!isRootView">
+    <ng-container *ngIf="currentStorageUnit; else loadingDetail">
+      <h2>{{ currentStorageUnit.name }}</h2>
+
+      <ion-list *ngIf="hasSubUnits">
+        <ion-item
+          *ngFor="let sub of currentStorageUnit.subUnits"
+          button
+          (click)="displayStorageUnitDetails(sub.id)"
+        >
+          {{ sub.name }}
+        </ion-item>
+      </ion-list>
+
+      <ion-list *ngIf="hasItems">
+        <ion-item *ngFor="let item of currentStorageUnit.items">
+          <ion-label>
+            <h3>{{ item.name }} ({{ item.quantity }})</h3>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <ion-button expand="block" (click)="goBack()">
+        ← Back
+      </ion-button>
+    </ng-container>
+    <ng-template #loadingDetail>
+      <ion-spinner></ion-spinner>
+    </ng-template>
   </ng-container>
 
 </ion-content>
