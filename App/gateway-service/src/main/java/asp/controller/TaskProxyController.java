@@ -28,7 +28,7 @@ public class TaskProxyController {
         String role = extractUserRole(authHeader);
         if (!isAllowedForGet(role)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Access denied: only CD, ADMIN, ADMINISTRATOR, or PM can access tasks.");
+                    .body("Access denied: only CD, ADMIN, ADMINISTRATOR, PM or VOLUNTEER can access tasks.");
         }
 
         HttpHeaders headers = new HttpHeaders();

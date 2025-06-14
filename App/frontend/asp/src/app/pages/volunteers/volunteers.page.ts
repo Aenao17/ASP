@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { VolunteerService } from '../../services/volunteer.service';
-import { NavController } from '@ionic/angular';
+import { NavController, AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-volunteers',
@@ -13,6 +13,15 @@ export class VolunteersPage implements OnInit {
   selectedVolunteer: any = null;
   isEditModalOpen = false;
   isAddFormOpen = false;
+  usernameError = false;
+  isLoading = false;
+
+  searchTerm = '';
+  selectedDepartment: string | null = null;
+  pointsFilter = {
+    operator: '>=',
+    value: null as number | null
+  };
 
   newVolunteer = {
     usernameLinked: '',
@@ -23,7 +32,8 @@ export class VolunteersPage implements OnInit {
 
   constructor(
     private volunteerS: VolunteerService,
-    private navCtrl: NavController
+    private navCtrl: NavController,
+    private alertCtrl: AlertController
   ) {}
 
   ngOnInit() {
@@ -43,11 +53,41 @@ export class VolunteersPage implements OnInit {
     }
   }
 
+  get filteredVolunteers() {
+    return this.volunteers.filter(v => {
+      const matchesSearch =
+        this.searchTerm === '' ||
+        v.firstName?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        v.lastName?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+        v.username?.toLowerCase().includes(this.searchTerm.toLowerCase());
+
+      const matchesDepartment =
+        !this.selectedDepartment || v.departament === this.selectedDepartment;
+
+      const matchesPoints =
+        this.pointsFilter.value === null ||
+        (this.pointsFilter.operator === '>=' && v.points >= this.pointsFilter.value) ||
+        (this.pointsFilter.operator === '<=' && v.points <= this.pointsFilter.value) ||
+        (this.pointsFilter.operator === '=' && v.points === this.pointsFilter.value);
+
+      return matchesSearch && matchesDepartment && matchesPoints;
+    });
+  }
+
   toggleAddForm() {
     this.isAddFormOpen = !this.isAddFormOpen;
+    this.usernameError = false;
   }
 
   async addVolunteer() {
+    this.usernameError = false;
+
+    if (!this.newVolunteer.usernameLinked || this.newVolunteer.usernameLinked.trim() === '') {
+      this.usernameError = true;
+      return;
+    }
+
+    this.isLoading = true;
     try {
       await this.volunteerS.addVolunteer(this.newVolunteer);
       this.newVolunteer = {
@@ -57,10 +97,18 @@ export class VolunteersPage implements OnInit {
         departament: 'HR'
       };
       this.isAddFormOpen = false;
+      await this.getVolunteers();
     } catch (error) {
       console.error('Error adding volunteer:', error);
+      const alert = await this.alertCtrl.create({
+        header: 'Add Error',
+        message: 'Failed to add volunteer. Please try again.',
+        buttons: ['OK']
+      });
+      await alert.present();
+    } finally {
+      this.isLoading = false;
     }
-    this.getVolunteers();
   }
 
   editVolunteer(volunteer: any) {
@@ -70,27 +118,36 @@ export class VolunteersPage implements OnInit {
 
   async saveVolunteer() {
     try {
-      //take only first 10 characters of birthday
       this.selectedVolunteer.birthday = this.selectedVolunteer.birthday.substring(0, 10).split('-').reverse().join('-');
-
       await this.volunteerS.updateVolunteer(this.selectedVolunteer.username, this.selectedVolunteer);
       this.isEditModalOpen = false;
       this.getVolunteers();
     } catch (error) {
       console.error('Error updating volunteer:', error);
+      const alert = await this.alertCtrl.create({
+        header: 'Update Error',
+        message: 'Failed to update volunteer. Please try again.',
+        buttons: ['OK']
+      });
+      await alert.present();
     }
-    this.getVolunteers();
   }
 
   async deleteVolunteer(username: string) {
-    if (confirm('Are you sure you want to delete this volunteer?')) {
-      try {
-        await this.volunteerS.deleteVolunteer(username);
-        this.getVolunteers();
-      } catch (error) {
-        console.error('Error deleting volunteer:', error);
-      }
+    const confirmDelete = confirm('Are you sure you want to delete this volunteer?');
+    if (!confirmDelete) return;
+
+    try {
+      await this.volunteerS.deleteVolunteer(username);
       this.getVolunteers();
+    } catch (error) {
+      console.error('Error deleting volunteer:', error);
+      const alert = await this.alertCtrl.create({
+        header: 'Delete Error',
+        message: 'Failed to delete volunteer. Please try again.',
+        buttons: ['OK']
+      });
+      await alert.present();
     }
   }
 

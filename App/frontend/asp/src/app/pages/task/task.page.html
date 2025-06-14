@@ -63,8 +63,9 @@
         <p *ngIf="t.description">Description: {{ t.description }}</p>
         <p *ngIf="t.createdAt">Created at: {{ t.createdAt | date:'short' }}</p>
         <p>Points: {{ t.points }}</p>
+        <p *ngIf="t.volunteers">Assigned to: {{ t.volunteers }}</p>
       </ion-label>
-      <ion-button fill="clear" slot="end" (click)="takeTask(t)">Take task</ion-button>
+      <ion-button *ngIf="t.showTakeButton" fill="clear" slot="end" (click)="takeTask(t)">Take task</ion-button>
     </ion-item>
   </ion-list>
 

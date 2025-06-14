@@ -2,46 +2,92 @@
   <div class="volunteer-container">
     <h1>VOLUNTEERS DASHBOARD</h1>
 
-    <!-- Table view for volunteers -->
-    <ion-grid>
-      <ion-row>
-        <ion-col>
-          <table class="volunteer-table">
-            <thead>
-            <tr>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Institutional Email</th>
-              <th>Phone</th>
-              <th>Birthday</th>
-              <th>Department</th>
-              <th>Points</th>
-              <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let volunteer of volunteers">
-              <td>{{ volunteer.firstName }}</td>
-              <td>{{ volunteer.lastName }}</td>
-              <td>{{ volunteer.username }}</td>
-              <td>{{ volunteer.email }}</td>
-              <td>{{ volunteer.institutionalEmail }}</td>
-              <td>{{ volunteer.phoneNumber }}</td>
-              <td>{{ volunteer.birthday }}</td>
-              <td>{{ volunteer.departament }}</td>
-              <td>{{ volunteer.points }}</td>
-              <td class="action-cell">
-                <ion-button size="small" color="warning" (click)="editVolunteer(volunteer)">Edit</ion-button>
-                <ion-button size="small" color="danger" (click)="deleteVolunteer(volunteer.username)">Delete</ion-button>
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+    <!-- Filters -->
+    <ion-item>
+      <ion-label position="floating">Search</ion-label>
+      <ion-input [(ngModel)]="searchTerm" placeholder="Search by name or username"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Department</ion-label>
+      <ion-select [(ngModel)]="selectedDepartment" placeholder="All">
+        <ion-select-option [value]="null">All</ion-select-option>
+        <ion-select-option value="HR">HR</ion-select-option>
+        <ion-select-option value="EVENTS">EVENTS</ion-select-option>
+        <ion-select-option value="EXTERNE">EXTERNE</ion-select-option>
+        <ion-select-option value="IMPR">IMPR</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Points</ion-label>
+      <ion-select [(ngModel)]="pointsFilter.operator">
+        <ion-select-option value=">=">≥</ion-select-option>
+        <ion-select-option value="<=">≤</ion-select-option>
+        <ion-select-option value="=">=</ion-select-option>
+      </ion-select>
+      <ion-input type="number" [(ngModel)]="pointsFilter.value" placeholder="Points"></ion-input>
+    </ion-item>
+
+    <!-- Responsive View -->
+    <div class="responsive-volunteer-list">
+      <!-- Desktop Table -->
+      <div class="desktop-table">
+        <table class="volunteer-table">
+          <thead>
+          <tr>
+            <th>First</th>
+            <th>Last</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Inst. Email</th>
+            <th>Phone</th>
+            <th>Birthday</th>
+            <th>Departament</th>
+            <th>Points</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let volunteer of filteredVolunteers">
+            <td>{{ volunteer.firstName }}</td>
+            <td>{{ volunteer.lastName }}</td>
+            <td>{{ volunteer.username }}</td>
+            <td>{{ volunteer.email }}</td>
+            <td>{{ volunteer.institutionalEmail }}</td>
+            <td>{{ volunteer.phoneNumber }}</td>
+            <td>{{ volunteer.birthday }}</td>
+            <td>{{ volunteer.departament }}</td>
+            <td>{{ volunteer.points }}</td>
+            <td>
+              <ion-button size="small" color="warning" (click)="editVolunteer(volunteer)">Edit</ion-button>
+              <ion-button size="small" color="danger" (click)="deleteVolunteer(volunteer.username)">Delete</ion-button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile Cards -->
+      <ion-list class="mobile-list">
+        <ion-card *ngFor="let volunteer of filteredVolunteers">
+          <ion-card-header>
+            <ion-card-title>{{ volunteer.firstName }} {{ volunteer.lastName }}</ion-card-title>
+            <ion-card-subtitle>{{ volunteer.username }}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <p><strong>Email:</strong> {{ volunteer.email }}</p>
+            <p><strong>Inst. Email:</strong> {{ volunteer.institutionalEmail }}</p>
+            <p><strong>Phone:</strong> {{ volunteer.phoneNumber }}</p>
+            <p><strong>Birthday:</strong> {{ volunteer.birthday }}</p>
+            <p><strong>Department:</strong> {{ volunteer.departament }}</p>
+            <p><strong>Points:</strong> {{ volunteer.points }}</p>
+            <ion-button size="small" color="warning" (click)="editVolunteer(volunteer)">Edit</ion-button>
+            <ion-button size="small" color="danger" (click)="deleteVolunteer(volunteer.username)">Delete</ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-list>
+    </div>
 
     <!-- Add Volunteer Form -->
     <ion-button expand="full" (click)="toggleAddForm()">
@@ -58,6 +104,9 @@
             <ion-label position="fixed">Username</ion-label>
             <ion-input [(ngModel)]="newVolunteer.usernameLinked"></ion-input>
           </ion-item>
+          <ion-text color="danger" *ngIf="usernameError">
+            <p class="ion-padding-start">Username is required.</p>
+          </ion-text>
 
           <ion-item>
             <ion-label position="fixed">Points</ion-label>
@@ -83,7 +132,11 @@
             </ion-select>
           </ion-item>
         </ion-list>
-        <ion-button expand="block" class="submit-button" (click)="addVolunteer()">✨ Add Volunteer ✨</ion-button>
+
+        <ion-button expand="block" class="submit-button" [disabled]="isLoading" (click)="addVolunteer()">
+          <ion-spinner *ngIf="isLoading" name="dots"></ion-spinner>
+          <span *ngIf="!isLoading">✨ Add Volunteer ✨</span>
+        </ion-button>
       </ion-card-content>
     </ion-card>
 

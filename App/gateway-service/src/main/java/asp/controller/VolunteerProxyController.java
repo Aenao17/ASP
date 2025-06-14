@@ -104,7 +104,51 @@ public class VolunteerProxyController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access denied: only CD, ADMIN, or ADMINISTRATOR can add volunteers.");
         }
 
+        String username = volunteerJson.split("\"usernameLinked\":\"")[1].split("\"")[0];
+        // Check if the user exists in the user service
         HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", authHeader);
+        HttpEntity<?> userRequestEntity = new HttpEntity<>(headers);
+        ResponseEntity<UserDTO[]> userResponse = restTemplate.exchange(
+                userServiceUrl + "/api/users",
+                HttpMethod.GET,
+                userRequestEntity,
+                UserDTO[].class
+        );
+
+        UserDTO[] users = userResponse.getBody();
+        boolean userExists = Arrays.stream(users)
+                .anyMatch(user -> user.getUsername().equals(username));
+
+        if (!userExists) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("User with username '" + username + "' does not exist.");
+        }
+
+        //edit user Role to VOLUNTEER
+        HttpHeaders userHeaders = new HttpHeaders();
+        userHeaders.setContentType(MediaType.APPLICATION_JSON);
+        userHeaders.set("Authorization", authHeader);
+        UserDTO userToUpdate = Arrays.stream(users)
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst()
+                .orElse(null);
+        if (userToUpdate != null) {
+            userToUpdate.setRole("VOLUNTEER");
+            HttpEntity<UserDTO> userRequest = new HttpEntity<>(userToUpdate, userHeaders);
+            ResponseEntity<String> userResponseUpdate = restTemplate.exchange(
+                    userServiceUrl + "/api/users/" + username,
+                    HttpMethod.PUT,
+                    userRequest,
+                    String.class
+            );
+            if (!userResponseUpdate.getStatusCode().is2xxSuccessful()) {
+                return ResponseEntity.status(userResponseUpdate.getStatusCode())
+                        .body("Failed to update user role: " + userResponseUpdate.getBody());
+            }
+        }
+
+        headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         HttpEntity<String> requestEntity = new HttpEntity<>(volunteerJson, headers);
@@ -131,6 +175,32 @@ public class VolunteerProxyController {
         if (!"ADMINISTRATOR".equals(role)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Access denied: only ADMINISTRATOR can delete volunteers.");
+        }
+
+        //chanfe user role to USER
+        HttpHeaders userHeaders = new HttpHeaders();
+        userHeaders.setContentType(MediaType.APPLICATION_JSON);
+        userHeaders.set("Authorization", authHeader);
+        ResponseEntity<UserDTO[]> userResponse = restTemplate.exchange(
+                userServiceUrl + "/api/users",
+                HttpMethod.GET,
+                new HttpEntity<>(userHeaders),
+                UserDTO[].class
+        );
+        UserDTO[] users = userResponse.getBody();
+        Optional<UserDTO> userOpt = Arrays.stream(users)
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+        if (userOpt.isPresent()) {
+            UserDTO userToUpdate = userOpt.get();
+            userToUpdate.setRole("USER");
+            HttpEntity<UserDTO> userRequest = new HttpEntity<>(userToUpdate, userHeaders);
+            ResponseEntity<String> userResponseUpdate = restTemplate.exchange(
+                    userServiceUrl + "/api/users/" + username,
+                    HttpMethod.PUT,
+                    userRequest,
+                    String.class
+            );
         }
 
         HttpHeaders headers = new HttpHeaders();

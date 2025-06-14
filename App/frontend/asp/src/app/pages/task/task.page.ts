@@ -12,6 +12,8 @@ interface Task {
   createdAt: string;
   deadline: string;
   points: number;
+  volunteers?: string[];
+  showTakeButton: boolean;
 }
 
 @Component({
@@ -27,6 +29,7 @@ export class TaskPage implements OnInit {
   error: string | null = null;
   userRole: string | null = null;
   showForm = false;
+  username: string = '';
 
   constructor(
     private taskService: TaskService,
@@ -45,6 +48,7 @@ export class TaskPage implements OnInit {
   ngOnInit() {
     this.loadTasks();
     this.getUserRole();
+    this.getUsername();
   }
 
   toggleForm() {
@@ -61,12 +65,25 @@ export class TaskPage implements OnInit {
     }
   }
 
+  async getUsername(): Promise<void> {
+    try {
+      this.username = await this.auth.getUsername();
+    } catch (error: any) {
+      console.error('Error getting username:', error);
+    }
+  }
+
   async loadTasks() {
     this.loading = true;
     this.error = null;
     try {
       const data: any = await this.taskService.getTasks();
       this.tasks = data;
+      for(let task of this.tasks) {
+        console.log('task volunteers:', task.volunteers);
+        console.log('current username:', this.username);
+        task.showTakeButton = !task.volunteers!.includes(this.username);
+      }
     } catch (err: any) {
       if (err.status === 401) {
         this.error = 'Failed to load tasks.';

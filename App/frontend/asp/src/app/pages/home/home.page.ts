@@ -11,7 +11,10 @@ import { Router } from "@angular/router";
 export class HomePage {
   shrinkLogo = false;
   showNavBar = false;
-  username = 'Student'; // Replace with real user if available
+  username = '';
+  isAdmin = false;
+  isCD = false;
+
 
   constructor(private auth: AuthService, private router: Router) {}
 
@@ -22,6 +25,7 @@ export class HomePage {
       this.shrinkLogo = true;
       this.showNavBar = true;
     }, 3000);
+    this.getUserRole();
   }
 
   async getUsername() {
@@ -38,6 +42,25 @@ export class HomePage {
 
   openOfficePage() {
     this.router.navigate(['/office']);
+  }
+
+  openAdminPage() {
+    if (this.isAdmin) {
+      this.router.navigate(['/admin']);
+    } else {
+      console.error('Access denied: User is not an administrator.');
+    }
+  }
+
+
+  private async getUserRole(){
+    const role = await this.auth.getUserRole();
+    if (role=="ADMINISTRATOR"){
+      this.isAdmin=true;
+    }
+    if (role=="CD" || role=="ADMINISTRATOR"){
+      this.isCD=true;
+    }
   }
 
   logout() {

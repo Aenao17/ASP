@@ -17,6 +17,12 @@
     </div>
 
     <div class="button-section">
+
+      <ion-button *ngIf="isAdmin" class="volunteers-button" (click)="openAdminPage()">
+        <ion-icon name="settings-outline" slot="start"></ion-icon>
+        Admin
+      </ion-button>
+
       <ion-button class="volunteers-button" (click)="openVolunteersPage()">
         <ion-icon name="people-outline" slot="start"></ion-icon>
         Volunteers
@@ -27,7 +33,7 @@
         Tasks
       </ion-button>
 
-      <ion-button class="volunteers-button" (click)="openOfficePage()">
+      <ion-button *ngIf="isCD" class="volunteers-button" (click)="openOfficePage()">
         <ion-icon name="business-outline" slot="start"></ion-icon>
         Inventory
       </ion-button>
