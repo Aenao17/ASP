@@ -21,4 +21,8 @@ public class Service {
         String volunteer  = requestBody.split(",")[1].split(":")[1].split("\"")[1];
         dao.assignTaskToUser(taskId, volunteer);
     }
+
+    public void completeTask(int taskId) {
+        dao.completeTask(taskId);
+    }
 }

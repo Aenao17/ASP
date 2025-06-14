@@ -100,6 +100,33 @@ public class TaskProxyController {
         return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
     }
 
+    @PutMapping("/complete")
+    public ResponseEntity<String> completeTask(
+            @RequestBody String taskJson,
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        String role = extractUserRole(authHeader);
+        if (!isAllowedForPut(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Access denied: only CD, ADMIN, or ADMINISTRATOR can complete tasks.");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", authHeader);
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(taskJson, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                taskServiceUrl + "/api/tasks/complete",
+                HttpMethod.PUT,
+                requestEntity,
+                String.class
+        );
+
+        return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+    }
+
     private String extractUserRole(String authHeader) {
         String token = extractToken(authHeader);
         Claims claims = jwtService.extractAllClaims(token);

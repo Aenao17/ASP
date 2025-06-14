@@ -6,12 +6,12 @@
 
 <ion-content class="ion-padding">
 
-  <!-- Only show Add Task button for non-USER roles -->
-  <ion-button expand="block" color="primary" (click)="toggleForm()" *ngIf="userRole !== 'USER'">
+  <!-- Add Task Button -->
+  <ion-button *ngIf="isCD" expand="block" color="primary" (click)="toggleForm()" >
     {{ showForm ? 'Cancel' : 'Add New Task' }}
   </ion-button>
 
-  <!-- Task creation form -->
+  <!-- Task Form -->
   <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" *ngIf="showForm && userRole !== 'USER'">
     <ion-list>
       <ion-item>
@@ -48,13 +48,14 @@
     <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
   </form>
 
+  <!-- Active Tasks -->
   <ion-item-divider></ion-item-divider>
-  <ion-list-header>All Tasks</ion-list-header>
+  <ion-list-header>Active Tasks</ion-list-header>
 
   <ion-spinner *ngIf="loading" name="dots"></ion-spinner>
 
-  <ion-list *ngIf="!loading && tasks.length">
-    <ion-item *ngFor="let t of tasks">
+  <ion-list *ngIf="!loading && activeTasks.length">
+    <ion-item *ngFor="let t of activeTasks">
       <ion-label>
         <h2>{{ t.title }}</h2>
         <p>Status: {{ t.status }}</p>
@@ -66,8 +67,33 @@
         <p *ngIf="t.volunteers">Assigned to: {{ t.volunteers }}</p>
       </ion-label>
       <ion-button *ngIf="t.showTakeButton" fill="clear" slot="end" (click)="takeTask(t)">Take task</ion-button>
+      <ion-button *ngIf="t.showCompleteButton" fill="clear" slot="end" (click)="completeTask(t)">Complete task</ion-button>
     </ion-item>
   </ion-list>
 
+  <!-- Toggle Completed Section -->
+  <ion-item-divider></ion-item-divider>
+  <ion-button expand="block" fill="outline" (click)="toggleCompletedTasks()">
+    {{ showCompletedTasks ? 'Hide Completed Tasks' : 'Show Completed Tasks' }}
+  </ion-button>
+
+  <!-- Completed Tasks -->
+  <ion-list *ngIf="showCompletedTasks && completedTasks.length">
+    <ion-list-header>Completed Tasks</ion-list-header>
+    <ion-item *ngFor="let t of completedTasks">
+      <ion-label>
+        <h2>{{ t.title }}</h2>
+        <p>Status: {{ t.status }}</p>
+        <p>Owner: {{ t.ownerUsername }}</p>
+        <p>Deadline: {{ t.deadline | date:'short' }}</p>
+        <p *ngIf="t.description">Description: {{ t.description }}</p>
+        <p *ngIf="t.createdAt">Created at: {{ t.createdAt | date:'short' }}</p>
+        <p>Points: {{ t.points }}</p>
+        <p *ngIf="t.volunteers">Assigned to: {{ t.volunteers }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <!-- Fallback -->
   <ion-text *ngIf="!loading && !tasks.length">No tasks found.</ion-text>
 </ion-content>

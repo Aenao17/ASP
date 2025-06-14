@@ -13,7 +13,8 @@ interface Task {
   deadline: string;
   points: number;
   volunteers?: string[];
-  showTakeButton: boolean;
+  showTakeButton?: boolean;
+  showCompleteButton?: boolean;
 }
 
 @Component({
@@ -30,6 +31,8 @@ export class TaskPage implements OnInit {
   userRole: string | null = null;
   showForm = false;
   username: string = '';
+  showCompletedTasks = false;
+  isCD: boolean = false;
 
   constructor(
     private taskService: TaskService,
@@ -55,9 +58,25 @@ export class TaskPage implements OnInit {
     this.showForm = !this.showForm;
   }
 
+  toggleCompletedTasks() {
+    this.showCompletedTasks = !this.showCompletedTasks;
+  }
+
+  get completedTasks(): Task[] {
+    return this.tasks.filter(t =>
+      t.status === 'COMPLETED' &&
+      (t.ownerUsername === this.username || t.volunteers?.includes(this.username))
+    );
+  }
+
+  get activeTasks(): Task[] {
+    return this.tasks.filter(t => t.status !== 'COMPLETED');
+  }
+
   async getUserRole(): Promise<void> {
     try {
       this.userRole = await this.auth.getUserRole();
+      this.isCD = this.userRole === 'CD' || this.userRole === 'ADMINISTRATOR';
     } catch (err: any) {
       if (err.status === 200) {
         this.userRole = err.error.text;
@@ -79,14 +98,28 @@ export class TaskPage implements OnInit {
     try {
       const data: any = await this.taskService.getTasks();
       this.tasks = data;
-      for(let task of this.tasks) {
-        console.log('task volunteers:', task.volunteers);
-        console.log('current username:', this.username);
-        task.showTakeButton = !task.volunteers!.includes(this.username);
+      for (let task of this.tasks) {
+        task.showTakeButton = !task.volunteers?.includes(this.username);
+        task.showCompleteButton = task.ownerUsername === this.username && task.status === 'IN_PROGRESS';
       }
     } catch (err: any) {
       if (err.status === 401) {
         this.error = 'Failed to load tasks.';
+      }
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async completeTask(task: Task) {
+    this.loading = true;
+    this.error = null;
+    try {
+      await this.taskService.completeTask(task.id);
+      this.loadTasks();
+    } catch (err: any) {
+      if (err.status === 401) {
+        this.error = 'Failed to complete task.';
       }
     } finally {
       this.loading = false;
@@ -119,8 +152,6 @@ export class TaskPage implements OnInit {
       ownerUsername: await this.auth.getUsername(),
       status: raw.status.toUpperCase()
     };
-
-    console.log('username: '+await this.auth.getUsername());
 
     this.loading = true;
     this.error = null;

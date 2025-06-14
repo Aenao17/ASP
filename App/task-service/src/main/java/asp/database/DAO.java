@@ -132,4 +132,15 @@ public class DAO {
             System.out.println(e.getMessage());
         }
     }
+
+    public void completeTask(int taskId) {
+        String sql = "UPDATE tasks SET status = 'COMPLETED' WHERE id = ?";
+        try (Connection conn = DBUtils.getConnection();
+             var pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, taskId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }

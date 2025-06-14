@@ -22,6 +22,7 @@ public class TasksController implements HttpHandler {
     @Override
     public void handle(com.sun.net.httpserver.HttpExchange exchange) {
         String method = exchange.getRequestMethod();
+        String path = exchange.getRequestURI().getPath();
         if (method.equals("GET")) {
             try {
                 handleGet(exchange);
@@ -35,7 +36,11 @@ public class TasksController implements HttpHandler {
                 e.printStackTrace();
             }
         } else if (method.equals("PUT")) {
-            handlePut(exchange);
+            if(path.endsWith("/complete")) {
+                handleComplete(exchange);
+            } else {
+                handlePut(exchange);
+            }
         } else if (method.equals("DELETE")) {
             //handleDelete(exchange);
         }
@@ -78,6 +83,27 @@ public class TasksController implements HttpHandler {
             String requestBody = new String(is.readAllBytes());
             service.assignUserToTask(requestBody);
             String response = "{Task updated successfully}";
+            exchange.sendResponseHeaders(200, response.length());
+            OutputStream os = exchange.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            try {
+                exchange.sendResponseHeaders(500, -1); // Internal Server Error
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        }
+    }
+
+    private void handleComplete(com.sun.net.httpserver.HttpExchange exchange) {
+        InputStream is = exchange.getRequestBody();
+        try {
+            String requestBody = new String(is.readAllBytes());
+            int taskId = Integer.parseInt(requestBody.split(":")[1].split("}")[0].trim());
+            service.completeTask(taskId);
+            String response = "{Task completed successfully}";
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());

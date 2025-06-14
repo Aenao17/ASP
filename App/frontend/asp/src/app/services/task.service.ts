@@ -50,4 +50,15 @@ export class TaskService {
       }
     }
   }
+
+  async completeTask(taskId: number): Promise<any> {
+    try {
+      return await lastValueFrom(this.http.put(`${this.apiUrl}/complete`, { taskId }));
+    } catch (error: any) {
+      if(error.status ==401) {
+        console.error('Error completing task:', error);
+        throw error;
+      }
+    }
+  }
 }
