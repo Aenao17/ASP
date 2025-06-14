@@ -28,6 +28,18 @@
       </ion-select>
       <ion-input type="number" [(ngModel)]="pointsFilter.value" placeholder="Points"></ion-input>
     </ion-item>
+
+    <!-- Sort by -->
+    <ion-item>
+      <ion-label>Sort by</ion-label>
+      <ion-select [(ngModel)]="sortOption">
+        <ion-select-option value="name">Name (A-Z)</ion-select-option>
+        <ion-select-option value="username">Username (A-Z)</ion-select-option>
+        <ion-select-option value="pointsAsc">Points (Low → High)</ion-select-option>
+        <ion-select-option value="pointsDesc">Points (High → Low)</ion-select-option>
+      </ion-select>
+    </ion-item>
+
     <ion-button (click)="sync()">Sync volunteers</ion-button>
 
     <!-- Responsive View -->
@@ -141,7 +153,6 @@
       </ion-card-content>
     </ion-card>
 
-    <!-- Edit Modal -->
     <!-- Edit Modal -->
     <ion-modal [isOpen]="isEditModalOpen" (ionModalDidDismiss)="closeEditModal()">
       <ng-template>

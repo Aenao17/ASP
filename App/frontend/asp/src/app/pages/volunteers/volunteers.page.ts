@@ -58,8 +58,10 @@ export class VolunteersPage implements OnInit {
     }
   }
 
+  sortOption: string = 'name';
+
   get filteredVolunteers() {
-    return this.volunteers.filter(v => {
+    let result = this.volunteers.filter(v => {
       const matchesSearch =
         this.searchTerm === '' ||
         v.firstName?.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
@@ -77,7 +79,28 @@ export class VolunteersPage implements OnInit {
 
       return matchesSearch && matchesDepartment && matchesPoints;
     });
+
+    // Apply sorting
+    switch (this.sortOption) {
+      case 'name':
+        result.sort((a, b) =>
+          (a.firstName + a.lastName).localeCompare(b.firstName + b.lastName)
+        );
+        break;
+      case 'username':
+        result.sort((a, b) => a.username.localeCompare(b.username));
+        break;
+      case 'pointsAsc':
+        result.sort((a, b) => a.points - b.points);
+        break;
+      case 'pointsDesc':
+        result.sort((a, b) => b.points - a.points);
+        break;
+    }
+
+    return result;
   }
+
 
   toggleAddForm() {
     this.isAddFormOpen = !this.isAddFormOpen;
@@ -123,7 +146,7 @@ export class VolunteersPage implements OnInit {
 
   async saveVolunteer() {
     try {
-      this.selectedVolunteer.birthday = this.selectedVolunteer.birthday?.substring(0, 10);
+      this.selectedVolunteer.birthday = this.selectedVolunteer.birthday?.substring(0, 10).split("-").reverse().join("-");
       await this.volunteerS.updateVolunteer(this.selectedVolunteer.username, this.selectedVolunteer);
       this.isEditModalOpen = false;
       await this.getVolunteers();
