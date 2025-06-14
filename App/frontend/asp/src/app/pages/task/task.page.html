@@ -1,11 +1,18 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Add New Task</ion-title>
+    <ion-title>Tasks</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" *ngIf="userRole !== 'USER'">
+
+  <!-- Only show Add Task button for non-USER roles -->
+  <ion-button expand="block" color="primary" (click)="toggleForm()" *ngIf="userRole !== 'USER'">
+    {{ showForm ? 'Cancel' : 'Add New Task' }}
+  </ion-button>
+
+  <!-- Task creation form -->
+  <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" *ngIf="showForm && userRole !== 'USER'">
     <ion-list>
       <ion-item>
         <ion-label position="stacked" for="title">Title</ion-label>
@@ -28,15 +35,17 @@
 
       <ion-item>
         <ion-label position="stacked" for="deadline">Deadline</ion-label>
-        <ion-datetime id="deadline" display-format="MMM DD, YYYY HH:mm" picker-format="MMM DD YYYY HH:mm" formControlName="deadline"></ion-datetime>
+        <ion-datetime id="deadline" display-format="MMM DD, YYYY HH:mm" formControlName="deadline"></ion-datetime>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked" for="points">Points</ion-label>
+        <ion-input id="points" type="number" formControlName="points"></ion-input>
       </ion-item>
     </ion-list>
 
-    <ion-button expand="full" type="submit" [disabled]="loading">Add Task</ion-button>
-
-    <div *ngIf="error">
-      <ion-text color="danger">{{ error }}</ion-text>
-    </div>
+    <ion-button expand="full" type="submit" [disabled]="loading">Submit Task</ion-button>
+    <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
   </form>
 
   <ion-item-divider></ion-item-divider>
@@ -49,8 +58,11 @@
       <ion-label>
         <h2>{{ t.title }}</h2>
         <p>Status: {{ t.status }}</p>
-        <p>Owner: {{ t.ownerId }}</p>
+        <p>Owner: {{ t.ownerUsername }}</p>
         <p>Deadline: {{ t.deadline | date:'short' }}</p>
+        <p *ngIf="t.description">Description: {{ t.description }}</p>
+        <p *ngIf="t.createdAt">Created at: {{ t.createdAt | date:'short' }}</p>
+        <p>Points: {{ t.points }}</p>
       </ion-label>
       <ion-button fill="clear" slot="end" (click)="takeTask(t)">Take task</ion-button>
     </ion-item>

@@ -1,16 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {TaskService} from "../../services/task.service";
-import {AuthService} from "../../services/auth.service";
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { TaskService } from "../../services/task.service";
+import { AuthService } from "../../services/auth.service";
+
 interface Task {
   id: number;
   title: string;
   description: string;
   status: string;
-  ownerId: string;
+  ownerUsername: string;
   createdAt: string;
   deadline: string;
+  points: number;
 }
+
 @Component({
   selector: 'app-task',
   templateUrl: './task.page.html',
@@ -18,12 +21,12 @@ interface Task {
   standalone: false
 })
 export class TaskPage implements OnInit {
-
   tasks: Task[] = [];
   taskForm: FormGroup;
   loading = false;
   error: string | null = null;
   userRole: string | null = null;
+  showForm = false;
 
   constructor(
     private taskService: TaskService,
@@ -35,9 +38,8 @@ export class TaskPage implements OnInit {
       description: [''],
       status: ['pending', Validators.required],
       deadline: ['', Validators.required],
-      volunteers: [''],
-      subTasks: ['']
-    });// Assuming getUserRole returns the current user's role
+      points: [0, [Validators.required, Validators.min(0)]]
+    });
   }
 
   ngOnInit() {
@@ -45,32 +47,16 @@ export class TaskPage implements OnInit {
     this.getUserRole();
   }
 
-  async takeTask(task: Task) {
-    this.loading = true;
-    this.error = null;
-    try {
-      const username = await this.auth.getUsername();
-      await this.taskService.assignTask(task.id, username); // Assuming "1" is the current user's ID
-      console.log('Task taken:', task);
-      this.loadTasks();
-    } catch (err: any) {
-      if(err.status === 401) {
-        this.error = 'Failed to take task.';
-        console.error(err);
-      }
-    } finally {
-      this.loading = false;
-    }
+  toggleForm() {
+    this.showForm = !this.showForm;
   }
 
   async getUserRole(): Promise<void> {
     try {
       this.userRole = await this.auth.getUserRole();
-      console.log('User role:', this.userRole);
-    }catch (err:any){
-      if(err.status==200){
+    } catch (err: any) {
+      if (err.status === 200) {
         this.userRole = err.error.text;
-        console.log('User role:', this.userRole);
       }
     }
   }
@@ -80,13 +66,27 @@ export class TaskPage implements OnInit {
     this.error = null;
     try {
       const data: any = await this.taskService.getTasks();
-      console.log('Tasks loaded:', data);
       this.tasks = data;
     } catch (err: any) {
-      if(err.status === 401) {
-      this.error = 'Failed to load tasks.';
-      console.error(err);
-        }
+      if (err.status === 401) {
+        this.error = 'Failed to load tasks.';
+      }
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async takeTask(task: Task) {
+    this.loading = true;
+    this.error = null;
+    try {
+      const username = await this.auth.getUsername();
+      await this.taskService.assignTask(task.id, username);
+      this.loadTasks();
+    } catch (err: any) {
+      if (err.status === 401) {
+        this.error = 'Failed to take task.';
+      }
     } finally {
       this.loading = false;
     }
@@ -98,27 +98,26 @@ export class TaskPage implements OnInit {
     const raw = this.taskForm.value;
     const taskData = {
       ...raw,
-      volunteers: raw.volunteers ? raw.volunteers.split(',').map((v: string) => v.trim()) : [],
-      subTasks: raw.subTasks ? raw.subTasks.split(',').map((s: string) => parseInt(s.trim(), 10)) : []
+      createdAt: new Date().toISOString(),
+      ownerUsername: await this.auth.getUsername(),
+      status: raw.status.toUpperCase()
     };
+
+    console.log('username: '+await this.auth.getUsername());
 
     this.loading = true;
     this.error = null;
-    taskData.createdAt = new Date().toISOString(); // Set createdAt to current time
-    taskData.ownerId = "1"; // Assuming getUsername returns the current user's ID
-    taskData.status = taskData.status.toUpperCase();
     try {
       await this.taskService.createTask(taskData);
-      this.taskForm.reset({status: 'pending'});
+      this.taskForm.reset({ status: 'pending', points: 0 });
+      this.showForm = false;
       this.loadTasks();
     } catch (err: any) {
-      if(err.status === 401) {
-      this.error = 'Failed to create task.';
-      console.error(err);
+      if (err.status === 401) {
+        this.error = 'Failed to create task.';
       }
     } finally {
       this.loading = false;
-      this.loadTasks();
     }
   }
 }

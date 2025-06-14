@@ -8,27 +8,35 @@ public class Task {
     private String title;
     private String description;
     private Status status;
-    private Integer ownerId;
+    private String ownerUsername;
     private String createdAt;
     private String deadline;
+    private Integer points;
     private List<String> volunteers;
-    private List<Integer> subTasks;
 
     public Task() {
     }
 
-    public Task(int id, String title, String description, Status status, Integer ownerId, String createdAt, String deadline) {
+    public Task(int id, String title, String description, Status status, String ownerUsername, String createdAt, String deadline, Integer points) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
-        this.ownerId = ownerId;
+        this.ownerUsername = ownerUsername;
         this.createdAt = createdAt;
         this.deadline = deadline;
+        this.points = points;
         this.volunteers = new ArrayList<>();
-        this.subTasks = new ArrayList<>();
     }
-    
+
+    public Integer getPoints() {
+        return points;
+    }
+
+    public void setPoints(Integer points) {
+        this.points = points;
+    }
+
     public int getId() {
         return id;
     }
@@ -61,12 +69,12 @@ public class Task {
         this.status = status;
     }
 
-    public Integer getOwnerId() {
-        return ownerId;
+    public String getownerUsername() {
+        return ownerUsername;
     }
 
-    public void setOwnerId(Integer ownerId) {
-        this.ownerId = ownerId;
+    public void setownerUsername(String ownerUsername) {
+        this.ownerUsername = ownerUsername;
     }
 
     public String getCreatedAt() {
@@ -91,13 +99,5 @@ public class Task {
 
     public void setVolunteers(List<String> volunteers) {
         this.volunteers = volunteers;
-    }
-
-    public List<Integer> getSubTasks() {
-        return subTasks;
-    }
-
-    public void setSubTasks(List<Integer> subTasks) {
-        this.subTasks = subTasks;
     }
 }

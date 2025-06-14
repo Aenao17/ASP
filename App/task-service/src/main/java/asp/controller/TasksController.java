@@ -3,6 +3,7 @@ package asp.controller;
 
 import asp.database.DAO;
 import asp.model.Task;
+import asp.service.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -13,16 +14,10 @@ import java.util.List;
 
 public class TasksController implements HttpHandler {
 
-    private final DAO Dao = new DAO();
+    private final Service service = new Service();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public TasksController() {
-        try {
-            this.Dao.createTable();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    public TasksController() {}
 
     @Override
     public void handle(com.sun.net.httpserver.HttpExchange exchange) {
@@ -48,9 +43,8 @@ public class TasksController implements HttpHandler {
 
     private void handleGet(com.sun.net.httpserver.HttpExchange exchange) throws IOException {
         try {
-            List<Task> tasks = Dao.getAllTasks();
+            List<Task> tasks = service.getAllTasks();
             String json = mapper.writeValueAsString(tasks);
-
             exchange.getResponseHeaders().set("Content-Type", "application/json");
             exchange.sendResponseHeaders(200, json.length());
             // Write the JSON response
@@ -67,7 +61,7 @@ public class TasksController implements HttpHandler {
         InputStream is = exchange.getRequestBody();
         try {
             Task t = mapper.readValue(is, Task.class);
-            Dao.addTask(t);
+            service.addTask(t);
             String response = "{Task added successfully}";
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();
@@ -82,9 +76,7 @@ public class TasksController implements HttpHandler {
         InputStream is = exchange.getRequestBody();
         try{
             String requestBody = new String(is.readAllBytes());
-            int taskId =Integer.parseInt(requestBody.split(",")[0].split(":")[1]);
-            String volunteer  = requestBody.split(",")[1].split(":")[1].split("\"")[1];
-            Dao.assignTaskToUser(taskId, volunteer);
+            service.assignUserToTask(requestBody);
             String response = "{Task updated successfully}";
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();

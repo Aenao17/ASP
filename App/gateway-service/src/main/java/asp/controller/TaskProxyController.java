@@ -47,7 +47,7 @@ public class TaskProxyController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createTask(
+    public ResponseEntity<Object> createTask(
             @RequestBody String taskJson,
             @RequestHeader("Authorization") String authHeader
     ) {
@@ -61,13 +61,13 @@ public class TaskProxyController {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", authHeader);
 
-        HttpEntity<String> requestEntity = new HttpEntity<>(taskJson, headers);
+        HttpEntity<Object> requestEntity = new HttpEntity<>(taskJson, headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(
+        ResponseEntity<Object> response = restTemplate.exchange(
                 taskServiceUrl + "/api/tasks",
                 HttpMethod.POST,
                 requestEntity,
-                String.class
+                Object.class
         );
 
         return ResponseEntity.status(response.getStatusCode()).body(response.getBody());

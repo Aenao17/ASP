@@ -13,25 +13,25 @@ public class Task {
     private String title;
     private String description;
     private String status;
-    private Integer ownerId;
+    private String ownerUsername;
     private String createdAt;
     private String deadline;
+    private Integer points;
     private List<String> volunteers;
-    private List<Integer> subTasks;
 
     public Task() {
     }
 
-    public Task(int id, String title, String description, String status, Integer ownerId, String createdAt, String deadline) {
+    public Task(int id, String title, String description, String status, String ownerUsername, String createdAt, String deadline, Integer points) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
-        this.ownerId = ownerId;
+        this.ownerUsername = ownerUsername;
         this.createdAt = createdAt;
         this.deadline = deadline;
+        this.points = points;
         this.volunteers = new ArrayList<>();
-        this.subTasks = new ArrayList<>();
     }
 
 }
