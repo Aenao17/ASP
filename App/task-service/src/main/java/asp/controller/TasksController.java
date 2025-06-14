@@ -25,6 +25,10 @@ public class TasksController implements HttpHandler {
         String path = exchange.getRequestURI().getPath();
         if (method.equals("GET")) {
             try {
+                if(path.endsWith("compute"))
+                {
+                    handleComputePoints(exchange);
+                }
                 handleGet(exchange);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -43,6 +47,27 @@ public class TasksController implements HttpHandler {
             }
         } else if (method.equals("DELETE")) {
             //handleDelete(exchange);
+        }
+    }
+
+    private void handleComputePoints(com.sun.net.httpserver.HttpExchange exchange) {
+        String username = exchange.getRequestURI().getPath().split("/")[3];
+        try {
+            Integer points = service.computePointsForUser(username);
+            String json = "{\"points\":" + points + "}";
+            exchange.getResponseHeaders().set("Content-Type", "application/json");
+            exchange.sendResponseHeaders(200, json.length());
+            // Write the JSON response
+            OutputStream os = exchange.getResponseBody();
+            os.write(json.getBytes());
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                exchange.sendResponseHeaders(500, -1); // Internal Server Error
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
         }
     }
 
@@ -66,8 +91,8 @@ public class TasksController implements HttpHandler {
         InputStream is = exchange.getRequestBody();
         try {
             Task t = mapper.readValue(is, Task.class);
-            service.addTask(t);
-            String response = "{Task added successfully}";
+            Integer id = service.addTask(t);
+            String response = id.toString();
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());

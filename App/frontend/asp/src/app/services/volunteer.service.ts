@@ -30,6 +30,17 @@ export class VolunteerService {
     }
   }
 
+  async syncVolunteers(): Promise<any>{
+    try {
+      return await lastValueFrom(this.http.get(`${this.apiUrl}/sync-points`));
+    } catch (error: any) {
+      if(error.status !=200) {
+        console.error('Error fetching volunteers:', error);
+        throw error;
+      }
+    }
+  }
+
   async addVolunteer(volunteerData: any): Promise<any> {
     try {
       //format birthday to DD-MM-YYYY

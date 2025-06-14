@@ -40,6 +40,11 @@ export class VolunteersPage implements OnInit {
     this.getVolunteers();
   }
 
+  async sync() {
+    await this.volunteerS.syncVolunteers();
+    await this.getVolunteers();
+  }
+
   async getVolunteers() {
     try {
       const response = await this.volunteerS.getVolunteers();
@@ -118,10 +123,10 @@ export class VolunteersPage implements OnInit {
 
   async saveVolunteer() {
     try {
-      this.selectedVolunteer.birthday = this.selectedVolunteer.birthday.substring(0, 10).split('-').reverse().join('-');
+      this.selectedVolunteer.birthday = this.selectedVolunteer.birthday?.substring(0, 10);
       await this.volunteerS.updateVolunteer(this.selectedVolunteer.username, this.selectedVolunteer);
       this.isEditModalOpen = false;
-      this.getVolunteers();
+      await this.getVolunteers();
     } catch (error) {
       console.error('Error updating volunteer:', error);
       const alert = await this.alertCtrl.create({
@@ -139,7 +144,7 @@ export class VolunteersPage implements OnInit {
 
     try {
       await this.volunteerS.deleteVolunteer(username);
-      this.getVolunteers();
+      await this.getVolunteers();
     } catch (error) {
       console.error('Error deleting volunteer:', error);
       const alert = await this.alertCtrl.create({

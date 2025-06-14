@@ -12,8 +12,8 @@ public class Service {
         return dao.getAllTasks();
     }
 
-    public void addTask(Task task) {
-        dao.addTask(task);
+    public Integer addTask(Task task) {
+        return dao.addTask(task);
     }
 
     public void assignUserToTask(String requestBody) {
@@ -24,5 +24,16 @@ public class Service {
 
     public void completeTask(int taskId) {
         dao.completeTask(taskId);
+    }
+
+    public Integer computePointsForUser(String username) {
+        List<Task> tasks = dao.getAllTasks();
+        int totalPoints = 0;
+        for (Task task : tasks) {
+            if (task.getVolunteers().contains(username) && task.getStatus().name().equals("COMPLETED")) {
+                totalPoints += task.getPoints() != null ? task.getPoints() : 0;
+            }
+        }
+        return totalPoints;
     }
 }

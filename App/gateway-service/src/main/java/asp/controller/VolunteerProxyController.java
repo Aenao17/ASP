@@ -8,12 +8,13 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/volunteers")
@@ -27,6 +28,8 @@ public class VolunteerProxyController {
     private String volunteerServiceUrl;
     @Value("${services.user}")
     private String userServiceUrl;
+    @Value("${services.task}")
+    private String taskServiceUrl;
 
     @GetMapping
     public ResponseEntity<?> getAllVolunteers(@RequestHeader("Authorization") String authHeader) {
@@ -95,6 +98,81 @@ public class VolunteerProxyController {
         return ResponseEntity.ok(fullVolunteers);
     }
 
+    @GetMapping("/sync-points")
+    public ResponseEntity<Object> syncPoints(@RequestHeader("Authorization") String authHeader) {
+        String role = extractUserRole(authHeader);
+        if (!isAllowedForPost(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Access denied: only CD, ADMIN, or ADMINISTRATOR can add volunteers.");
+        }
+
+        // Retrieve all volunteers
+        Object allObj = this.getAllVolunteers(authHeader).getBody();
+        List<FullVolunteer> volunteers = (List<FullVolunteer>) allObj;
+
+        for (FullVolunteer v : volunteers) {
+            Double Vpoints = Double.parseDouble(v.getPoints().toString());
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", authHeader);
+            HttpEntity<?> taskRequest = new HttpEntity<>(headers);
+
+            // Call task microservice to compute points
+            ResponseEntity<String> taskResponse = restTemplate.exchange(
+                    taskServiceUrl + "/api/tasks/" + v.getUsername() + "/compute",
+                    HttpMethod.GET,
+                    taskRequest,
+                    String.class
+            );
+
+            String pObj = taskResponse.getBody();
+            Double Tpoints = Double.parseDouble(pObj.split(":")[1].split("}")[0]);
+
+            if (Vpoints < Tpoints) {
+                v.setPoints(Tpoints);
+                this.updateVolunteer(v.getUsername(), v.toString(), authHeader);
+            } else if (Vpoints.equals(Tpoints)) {
+                continue;
+            } else {
+                // Vpoints > Tpoints → Add rectification task
+                double diff = Vpoints - Tpoints;
+
+                // Create new task
+                Map<String, Object> taskData = new HashMap<>();
+                taskData.put("title", "POINTS RECTIFICATION");
+                taskData.put("description", "Rectified points: " + diff + " points.");
+                taskData.put("ownerUsername", "admin");
+                String today = LocalDateTime.now().toString();
+                taskData.put("createdAt",today);
+                taskData.put("deadline",today);
+                taskData.put("points", diff);
+                taskData.put("status", "COMPLETED");
+
+                HttpEntity<Map<String, Object>> postRequest = new HttpEntity<>(taskData, headers);
+                ResponseEntity<String> postResp = restTemplate.postForEntity(
+                        taskServiceUrl + "/api/tasks",
+                        postRequest,
+                        String.class
+                );
+
+                // Assign task to volunteer
+
+                String assignPayload = "{\"taskId\":" + postResp.getBody().toString()+ ",\"username\":\"" + v.getUsername() + "\"}";
+                HttpEntity<String> assignRequest = new HttpEntity<>(assignPayload, headers);
+                restTemplate.put(
+                        taskServiceUrl + "/api/tasks",
+                        assignRequest
+                );
+
+                // Optionally update volunteer points to match Tpoints
+                v.setPoints(Tpoints);
+                this.updateVolunteer(v.getUsername(), v.toString(), authHeader);
+                this.syncPoints(authHeader);
+            }
+        }
+
+        return ResponseEntity.ok("Points synchronized successfully.");
+    }
 
     @PostMapping
     public ResponseEntity<String> addVolunteer(@RequestBody String volunteerJson, @RequestHeader("Authorization") String authHeader) {
@@ -227,7 +305,7 @@ public class VolunteerProxyController {
         Claims claims = jwtService.extractAllClaims(token);
         String role = claims.get("role", String.class);
 
-        if (!"ADMINISTRATOR".equals(role)) {
+        if (!"ADMINISTRATOR".equals(role) && !"CD".equals(role)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Access denied: only ADMINISTRATOR can update volunteers.");
         }

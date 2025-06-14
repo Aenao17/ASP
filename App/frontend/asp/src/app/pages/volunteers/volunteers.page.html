@@ -28,6 +28,7 @@
       </ion-select>
       <ion-input type="number" [(ngModel)]="pointsFilter.value" placeholder="Points"></ion-input>
     </ion-item>
+    <ion-button (click)="sync()">Sync volunteers</ion-button>
 
     <!-- Responsive View -->
     <div class="responsive-volunteer-list">
@@ -141,6 +142,7 @@
     </ion-card>
 
     <!-- Edit Modal -->
+    <!-- Edit Modal -->
     <ion-modal [isOpen]="isEditModalOpen" (ionModalDidDismiss)="closeEditModal()">
       <ng-template>
         <ion-header>
@@ -155,12 +157,12 @@
           <ion-list>
             <ion-item>
               <ion-label position="stacked">Points</ion-label>
-              <ion-input type="number" [ngModel]="selectedVolunteer.points"></ion-input>
+              <ion-input type="number" [(ngModel)]="selectedVolunteer.points!"></ion-input>
             </ion-item>
             <ion-item>
               <ion-label position="stacked">Birthday</ion-label>
               <ion-datetime
-                display-format="YYYY-MM-DD"
+                presentation="date"
                 [(ngModel)]="selectedVolunteer.birthday">
               </ion-datetime>
             </ion-item>
@@ -178,5 +180,6 @@
         </ion-content>
       </ng-template>
     </ion-modal>
+
   </div>
 </ion-content>

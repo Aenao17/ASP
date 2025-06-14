@@ -96,4 +96,14 @@ public class FullVolunteer {
     public void setPoints(Double points) {
         this.points = points;
     }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"usernameLinked\":\"" + username  + "\"," +
+                "\"birthday\":\"" + birthday + "\"," +
+                "\"departament\":\"" + departament + "\"," +
+                "\"points\":\"" + points +"\"" +
+                '}';
+    }
 }

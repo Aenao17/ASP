@@ -3,9 +3,7 @@ package asp.database;
 import asp.model.Status;
 import asp.model.Task;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,22 +92,40 @@ public class DAO {
         return new ArrayList<>();
     }
 
-    public void addTask(Task task) {
+    public Integer addTask(Task task) {
         String sql = "INSERT INTO tasks (title, description, status, ownerUsername, createdAt, deadline, points) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
         try (Connection conn = DBUtils.getConnection();
-             var pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
             pstmt.setString(1, task.getTitle());
             pstmt.setString(2, task.getDescription());
             pstmt.setString(3, task.getStatus().name());
-            pstmt.setObject(4, task.getownerUsername());
+            pstmt.setString(4, task.getownerUsername());
             pstmt.setString(5, task.getCreatedAt());
             pstmt.setString(6, task.getDeadline());
             pstmt.setInt(7, task.getPoints());
-            pstmt.executeUpdate();
+
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new SQLException("Inserting task failed, no rows affected.");
+            }
+
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1); // return the generated ID
+                } else {
+                    throw new SQLException("Inserting task failed, no ID obtained.");
+                }
+            }
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+            return null;
         }
     }
+
 
     public void assignTaskToUser(int taskId, String username) {
         String sql = "INSERT INTO volunteers_tasks (taskId, volunteerId) VALUES (?, ?)";
