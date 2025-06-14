@@ -20,15 +20,6 @@ export class OfficeService {
     private navCtrl: NavController
   ) {}
 
-  async getAllStorage(): Promise<any> {
-    try {
-      return await this.http.get(`${this.apiUrl}/storage-units`).toPromise();
-    } catch (error: any) {
-      console.error('Error fetching storage:', error);
-      throw error;
-    }
-  }
-
   async getStorageUnitById(id: number): Promise<any> {
     try {
       return await this.http.get(`${this.apiUrl}/storage-unit/${id}`).toPromise();

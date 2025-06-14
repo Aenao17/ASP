@@ -51,6 +51,7 @@
           {{ rootStorageUnit.name }}
         </ion-item>
       </ion-list>
+
     </ng-container>
     <ng-template #loadingRoot>
       <ion-spinner></ion-spinner>
@@ -61,7 +62,9 @@
   <ng-container *ngIf="!isRootView">
     <ng-container *ngIf="currentStorageUnit; else loadingDetail">
       <h2>{{ currentStorageUnit.name }}</h2>
-
+      <ion-button expand="block" (click)="goBack()">
+        ← Back
+      </ion-button>
       <ion-list *ngIf="hasSubUnits">
         <ion-item
           *ngFor="let sub of currentStorageUnit.subUnits"
@@ -90,11 +93,6 @@
           </ion-item-options>
         </ion-item-sliding>
       </ion-list>
-
-      <!-- back button remains visible -->
-      <ion-button expand="block" (click)="goBack()">
-        ← Back
-      </ion-button>
     </ng-container>
     <ng-template #loadingDetail>
       <ion-spinner></ion-spinner>

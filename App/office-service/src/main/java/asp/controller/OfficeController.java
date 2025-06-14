@@ -76,18 +76,6 @@ public class OfficeController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/items")
-    public ResponseEntity<List<InventoryItem>> getAllItems() {
-        List<InventoryItem> items = inventoryService.getAllItems();
-        return ResponseEntity.ok(items);
-    }
-
-    @GetMapping("/storage-units")
-    public ResponseEntity<List<StorageUnit>> getAllUnits() {
-        List<StorageUnit> units = inventoryService.getAllUnits();
-        return ResponseEntity.ok(units);
-    }
-
     @GetMapping("items/search/{name}")
     public ResponseEntity<List<InventoryItem>> searchItems(@PathVariable String name) {
         List<InventoryItem> items = inventoryService.searchItems(name);

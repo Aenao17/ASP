@@ -129,32 +129,6 @@ public class OfficeProxyController {
         return ResponseEntity.ok(resp.getBody());
     }
 
-    @GetMapping("/items")
-    public ResponseEntity<List<InventoryItemDto>> getAllItems(
-            @RequestHeader("Authorization") String auth
-    ) {
-        HttpEntity<Void> req = new HttpEntity<>(headers(auth));
-        ResponseEntity<List<InventoryItemDto>> resp = restTemplate.exchange(
-                officeServiceUrl + "/api/office/items",
-                HttpMethod.GET, req,
-                new ParameterizedTypeReference<List<InventoryItemDto>>() {}
-        );
-        return ResponseEntity.ok(resp.getBody());
-    }
-
-    @GetMapping("/storage-units")
-    public ResponseEntity<Object> getAllUnits(
-            @RequestHeader("Authorization") String auth
-    ) {
-        HttpEntity<Void> req = new HttpEntity<>(headers(auth));
-        ResponseEntity<Object> resp = restTemplate.exchange(
-                officeServiceUrl + "/api/office/storage-units",
-                HttpMethod.GET, req,
-                new ParameterizedTypeReference<Object>() {}
-        );
-        return ResponseEntity.ok(resp.getBody());
-    }
-
     @GetMapping("/storage-unit/{id}")
     public ResponseEntity<Object> getUnitById(
             @PathVariable Integer id,
