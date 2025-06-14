@@ -121,5 +121,15 @@ public class DAO {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+
+        // Update the task status to IN_PROGRESS if it was PENDING
+        String updateSql = "UPDATE tasks SET status = 'IN_PROGRESS' WHERE id = ? AND status = 'PENDING'";
+        try (Connection conn = DBUtils.getConnection();
+             var pstmt = conn.prepareStatement(updateSql)) {
+            pstmt.setInt(1, taskId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

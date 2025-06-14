@@ -92,7 +92,6 @@ public class VolunteerProxyController {
                     }
                 })
                 .toList();
-
         return ResponseEntity.ok(fullVolunteers);
     }
 
