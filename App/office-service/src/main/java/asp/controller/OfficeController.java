@@ -53,7 +53,7 @@ public class OfficeController {
     }
 
     @GetMapping("/items/{id}")
-    public ResponseEntity<List<InventoryItem>> getUnit(@PathVariable Integer id) {
+    public ResponseEntity<List<InventoryItem>> getFromUnit(@PathVariable Integer id) {
         List<InventoryItem> items = inventoryService.getAllItemsFromUnit(id);
         return ResponseEntity.ok(items);
     }

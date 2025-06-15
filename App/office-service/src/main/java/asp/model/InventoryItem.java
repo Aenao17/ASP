@@ -18,6 +18,7 @@ public class InventoryItem implements Component {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter
     private Integer id;
 
     @Setter

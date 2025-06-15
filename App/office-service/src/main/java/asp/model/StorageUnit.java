@@ -31,10 +31,12 @@ public class StorageUnit implements Component {
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     @Getter
+    @Setter
     private List<StorageUnit> subUnits = new ArrayList<>();
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     @Getter
+    @Setter
     private List<InventoryItem> items = new ArrayList<>();
 
     public StorageUnit() { }

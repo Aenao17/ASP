@@ -150,7 +150,7 @@ export class OfficePage implements OnInit {
     if (!this.currentStorageUnit) return;
     const alert = await this.alertCtrl.create({
       header: 'New Storage Unit',
-      inputs: [{ name: 'name', type: 'text', placeholder: 'e.g. Electronics Shelf' }],
+      inputs: [{ name: 'name', type: 'text', placeholder: 'e.g. Cutie' }],
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
