@@ -1,0 +1,118 @@
+ion-content {
+  --background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: #fff;
+  padding: 1rem;
+}
+
+// Navigation Bar
+.nav-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #102348;
+  padding: 1rem;
+  color: #fff;
+
+  span {
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+}
+
+.asp-logo-small {
+  width: 40px;
+  cursor: pointer;
+}
+
+// Titles
+h2 {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-size: 1.4rem;
+  color: #ffffff;
+  text-align: center;
+}
+
+// Searchbar
+ion-searchbar {
+  --background: #1e2a40;
+  --color: white;
+  --placeholder-color: #aaa;
+  --icon-color: #ccc;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+}
+
+// General List Styles
+ion-list {
+  background: #15243a;
+  border-radius: 12px;
+  padding: 0.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+ion-item {
+  --background: #1f3554;
+  --color: white;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  p {
+    font-size: 0.8rem;
+    color: #cfd3dc;
+    margin-top: 0.25rem;
+  }
+}
+
+// Sliding Options
+ion-item-options {
+  background: transparent;
+
+  ion-item-option {
+    font-weight: 500;
+    font-size: 0.85rem;
+  }
+
+  ion-item-option[color="primary"] {
+    background-color: #3880ff;
+    color: white;
+  }
+
+  ion-item-option[color="danger"] {
+    background-color: #eb445a;
+    color: white;
+  }
+}
+
+// Buttons
+ion-button {
+  margin-top: 1rem;
+  --border-radius: 8px;
+  --box-shadow: none;
+  font-weight: 500;
+}
+
+ion-spinner {
+  display: block;
+  margin: 2rem auto;
+}
+
+ion-toolbar{
+  --background: #285393;
+}
+
+// Empty state
+ion-item[disabled],
+ion-text {
+  color: #ccc;
+  font-style: italic;
+  text-align: center;
+  margin-top: 1rem;
+}

@@ -14,6 +14,7 @@ export class HomePage {
   username = '';
   isAdmin = false;
   isCD = false;
+  isUser = false;
 
 
   constructor(private auth: AuthService, private router: Router) {}
@@ -26,6 +27,10 @@ export class HomePage {
       this.showNavBar = true;
     }, 3000);
     this.getUserRole();
+  }
+
+  goHome(){
+    this.router.navigate(['/home']);
   }
 
   async getUsername() {
@@ -60,6 +65,10 @@ export class HomePage {
     }
     if (role=="CD" || role=="ADMINISTRATOR"){
       this.isCD=true;
+    }
+
+    if (role=="USER"){
+      this.isUser=true;
     }
   }
 

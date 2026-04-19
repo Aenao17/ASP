@@ -30,6 +30,29 @@ export class VolunteerService {
     }
   }
 
+  async getVolunteerByUsername(username: string): Promise<any> {
+    try {
+      return await lastValueFrom(this.http.get(`${this.apiUrl}/${username}`));
+    } catch (error: any) {
+      if(error.status !=200) {
+        console.error(`Error fetching volunteer ${username}:`, error);
+        throw error;
+      }
+    }
+  }
+
+  async addPointsToVolunteer(username: string, points: number): Promise<any> {
+    try {
+      const body = { points: points.toString() };
+      return await lastValueFrom(this.http.put(`${this.apiUrl}/${username}/add-points`, body));
+    } catch (error: any) {
+      if(error.status !=200) {
+        console.error(`Error adding points to volunteer ${username}:`, error);
+        throw error;
+      }
+    }
+  }
+
   async syncVolunteers(): Promise<any>{
     try {
       return await lastValueFrom(this.http.get(`${this.apiUrl}/sync-points`));

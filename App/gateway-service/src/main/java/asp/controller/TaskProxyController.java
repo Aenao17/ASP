@@ -159,6 +159,7 @@ public class TaskProxyController {
     private boolean isAllowedForPost(String role) {
         return "ADMINISTRATOR".equals(role)
                 || "ADMIN".equals(role)
-                || "CD".equals(role);
+                || "CD".equals(role)
+                || "PM".equals(role);
     }
 }

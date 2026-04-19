@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class InventoryService {
@@ -32,6 +33,12 @@ public class InventoryService {
     public void deleteUnit(Integer unitId) {
         StorageUnit unit = suRepo.findById(unitId)
                 .orElseThrow(() -> new EntityNotFoundException("Unit not found"));
+        StorageUnit unit2 = suRepo.findByName("SEDIU")
+                .orElseThrow(() -> new EntityNotFoundException("Root unit not found"));
+        // Prevent deletion of the root unit
+        if (Objects.equals(unit.getId(), unit2.getId())) {
+            throw new IllegalArgumentException("Cannot delete the root unit");
+        }
         if (unit.getParent() != null) {
             StorageUnit parent = unit.getParent();
             parent.getSubUnits().remove(unit);

@@ -1,23 +1,100 @@
+// Base container
+ion-content {
+  --background: linear-gradient(135deg, #1e3c72, #2a5298);
+  position: relative;
+}
 .volunteer-container {
-  padding: 1rem;
+  padding: 2rem;
+  max-width: 1300px;
+  margin: 0 auto;
+  color: #fff;
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    color: #ffffff;
+  }
+
+  ion-item {
+    --background: #1e2a40;
+    --color: #fff;
+    --border-radius: 12px;
+    margin-bottom: 1rem;
+  }
+
+  ion-input,
+  ion-select {
+    --padding-start: 12px;
+    --padding-end: 12px;
+    --color: #fff;
+  }
+
+  ion-select-option {
+    color: #000;
+  }
+
+  ion-button {
+    margin: 0.5rem 0;
+  }
 }
 
+// Volunteer Table
 .volunteer-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  background-color: #0f1d36;
+  border: 1px solid #3b4b63; // outer border
+  border-radius: 8px;
+  overflow: hidden;
+  table-layout: fixed;
 
-  th, td {
-    padding: 8px;
-    border-bottom: 1px solid #ccc;
+  th,
+  td {
+    padding: 10px;
+    border: 1px solid #3b4b63; // adds vertical + horizontal gridlines
     text-align: left;
+    color: #fff;
+    word-wrap: break-word;
   }
 
   th {
-    background-color: #000;
+    background: linear-gradient(90deg, #1e3a5f, #122544);
+    font-weight: 600;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  td {
+    text-align: center;
+  }
+
+  tr:hover {
+    background-color: #1c2d4a;
+  }
+
+  td:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+
+    ion-button {
+      height: 2.2rem;
+      font-size: 0.75rem;
+      width: 110px; // fixed width for all buttons
+      --padding-start: 0;
+      --padding-end: 0;
+      --border-radius: 8px;
+      justify-content: center;
+      text-align: center;
+    }
   }
 }
 
+
+  // Mobile responsiveness
 .responsive-volunteer-list {
   .desktop-table {
     display: block;
@@ -28,6 +105,115 @@
   }
 }
 
+// Volunteer cards on mobile
+ion-card {
+  --background: #1e2a40;
+  color: #fff;
+  border-radius: 15px;
+
+  ion-card-title,
+  ion-card-subtitle {
+    color: #fff;
+  }
+
+  ion-card-content {
+    p {
+      margin: 4px 0;
+    }
+
+    ion-button {
+      margin-top: 0.5rem;
+      margin-right: 0.5rem;
+    }
+  }
+}
+
+// Add Volunteer Card
+.add-volunteer-card {
+  margin-top: 1rem;
+  background: #1c2d45;
+  color: #fff;
+  border-radius: 12px;
+
+  ion-card-header {
+    text-align: center;
+  }
+
+  ion-list {
+    ion-item {
+      --background: #273c5b;
+    }
+  }
+
+  .submit-button {
+    margin-top: 1rem;
+    --background: linear-gradient(90deg, #2b68ff, #5142ff);
+    --color: white;
+  }
+}
+
+
+
+// Modal adjustments
+ion-modal {
+  ion-content {
+    --background: #101926;
+    color: #fff;
+  }
+
+  ion-item {
+    --background: #1c2a3a;
+    --color: #fff;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+
+  ion-button {
+    margin: 1rem auto;
+    display: block;
+  }
+}
+
+// Points window
+.volunteer-window {
+  text-align: center;
+  padding: 3rem 2rem;
+
+  h1, h2 {
+    color: #fff;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+    margin-top: 1rem;
+  }
+}
+
+// Navigation bar
+.nav-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #102348;
+  padding: 1rem;
+  color: #fff;
+
+  span {
+    font-size: 1.1rem;
+    font-weight: 500;
+  }
+}
+
+.asp-logo-small {
+  width: 40px;
+  cursor: pointer;
+}
+
+// Mobile adjustments
 @media screen and (max-width: 768px) {
   .responsive-volunteer-list {
     .desktop-table {
@@ -49,5 +235,11 @@
 
   ion-card {
     margin-bottom: 1rem;
+  }
+
+  .nav-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 }

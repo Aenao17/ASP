@@ -1,0 +1,185 @@
+// Background
+ion-content {
+  --background: linear-gradient(135deg, #1e3c72, #2a5298);
+  color: #fff;
+  position: relative;
+}
+
+// Navigation bar
+.nav-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #102348;
+  padding: 1rem;
+
+  span {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #fff;
+  }
+
+  .asp-logo-small {
+    width: 40px;
+    height: auto;
+    cursor: pointer;
+  }
+}
+
+// Container
+.task-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+
+  ion-button {
+    margin-top: 1rem;
+  }
+
+  ion-text {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+ion-toolbar {
+  --background: #285393;
+  --color: #fff;
+  --border-radius: 0;
+  padding: 0.5rem 1rem;
+
+  ion-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #aad3ff;
+  }
+}
+
+// Form
+form {
+  background: #1f2e4a;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-top: 1rem;
+
+  ion-item {
+    --background: transparent;
+    --color: white;
+    margin-bottom: 0.75rem;
+  }
+
+  ion-label {
+    font-weight: 500;
+    color: #aad3ff;
+  }
+
+  ion-input,
+  ion-textarea,
+  ion-select,
+  ion-datetime {
+    --color: white;
+  }
+}
+
+// Task Lists
+ion-list-header {
+  font-size: 1.2rem;
+  margin-top: 2rem;
+  color: #fff;
+  padding-left: 0.5rem;
+}
+
+ion-item-divider {
+  background: transparent;
+  border-top: 1px solid #ccc;
+  margin-top: 1rem;
+}
+
+ion-list{
+  padding: 0;
+  margin: 0;
+  --background: #fff;
+  --ion-item-background: transparent;
+
+  ion-item {
+    --background: #273c5b;
+    --color: #fff;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+
+    ion-label {
+      color: #cde0ff;
+      font-weight: 500;
+
+      h2 {
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-bottom: 4px;
+      }
+
+      p {
+        font-size: 0.9rem;
+        margin: 2px 0;
+      }
+    }
+  }
+
+  ion-button {
+    --background: linear-gradient(90deg, #2b68ff, #5142ff);
+    --color: white;
+    margin-left: 8px;
+    font-weight: bold;
+  }
+}
+
+// Task cards
+ion-item {
+  --background: #1c2b4a;
+  border-radius: 10px;
+  margin: 0.5rem 0;
+
+  ion-label {
+    h2 {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    p {
+      margin: 2px 0;
+      color: #d0d8e6;
+      font-size: 0.9rem;
+    }
+  }
+
+  ion-button {
+    margin-left: 8px;
+  }
+}
+
+// Spinner
+ion-spinner {
+  display: block;
+  margin: 1rem auto;
+}
+
+// Mobile adjustments
+@media (max-width: 768px) {
+  .task-container {
+    padding: 1rem;
+  }
+
+  form {
+    padding: 0.75rem;
+  }
+
+  ion-label h2 {
+    font-size: 1rem;
+  }
+
+  ion-label p {
+    font-size: 0.85rem;
+  }
+}

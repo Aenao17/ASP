@@ -38,6 +38,9 @@
       </div>
 
       <button type="submit" [disabled]="!username || !password">Signup</button>
+      <ion-text color="danger" *ngIf="errorMessage">
+        <p class="ion-padding">{{ errorMessage }}</p>
+      </ion-text>
     </form>
     <p>Already have an account? <a href="/login">Log in here</a></p>
   </div>

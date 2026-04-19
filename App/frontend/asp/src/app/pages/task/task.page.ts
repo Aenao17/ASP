@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TaskService } from "../../services/task.service";
 import { AuthService } from "../../services/auth.service";
+import { Router } from "@angular/router";
+import {AlertController} from "@ionic/angular";
 
 interface Task {
   id: number;
@@ -33,11 +35,14 @@ export class TaskPage implements OnInit {
   username: string = '';
   showCompletedTasks = false;
   isCD: boolean = false;
+  isUser: boolean = false;
 
   constructor(
     private taskService: TaskService,
     private fb: FormBuilder,
-    private auth: AuthService
+    private auth: AuthService,
+    private router: Router,
+    private alertCtrl: AlertController
   ) {
     this.taskForm = this.fb.group({
       title: ['', Validators.required],
@@ -58,6 +63,11 @@ export class TaskPage implements OnInit {
     this.showForm = !this.showForm;
   }
 
+  goHome(){
+    this.router.navigate(['/home']);
+  }
+
+
   toggleCompletedTasks() {
     this.showCompletedTasks = !this.showCompletedTasks;
   }
@@ -76,7 +86,8 @@ export class TaskPage implements OnInit {
   async getUserRole(): Promise<void> {
     try {
       this.userRole = await this.auth.getUserRole();
-      this.isCD = this.userRole === 'CD' || this.userRole === 'ADMINISTRATOR';
+      this.isCD = this.userRole === 'CD' || this.userRole === 'ADMINISTRATOR' || this.userRole === 'PM';
+      this.isUser = this.userRole === 'USER';
     } catch (err: any) {
       if (err.status === 200) {
         this.userRole = err.error.text;
@@ -142,9 +153,16 @@ export class TaskPage implements OnInit {
     }
   }
 
-  async onSubmit() {
-    if (this.taskForm.invalid) return;
+  private async showAlert(header: string, message: string) {
+    const alert = await this.alertCtrl.create({
+      header,
+      message,
+      buttons: ['OK']
+    });
+    await alert.present();
+  }
 
+  async onSubmit() {
     const raw = this.taskForm.value;
     const taskData = {
       ...raw,
@@ -152,6 +170,24 @@ export class TaskPage implements OnInit {
       ownerUsername: await this.auth.getUsername(),
       status: raw.status.toUpperCase()
     };
+    console.log(taskData);
+    // Validate taskData
+    if (!taskData.title) {
+      await this.showAlert('Input Error', 'Title is required.');
+      return;
+    }
+    if (!taskData.deadline) {
+      this.showAlert('Input Error', 'Deadline is required.');
+      return;
+    }
+    if (taskData.points <= 0) {
+      this.showAlert('Input Error', 'Points must be a positive number.');
+      return;
+    }
+    if (taskData.description.length > 30) {
+      this.showAlert('Input Error', 'Description must be less than 30 characters.');
+      return;
+    }
 
     this.loading = true;
     this.error = null;

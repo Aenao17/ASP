@@ -1,4 +1,8 @@
-<ion-header>
+<ion-header *ngIf="!isUser">
+  <div class="nav-bar">
+    <img src="assets/img/asp-logo.png" alt="ASP Logo" class="asp-logo-small" (click)="goHome()">
+    <span>Asociația Studenților Programatori</span>
+  </div>
   <ion-toolbar>
     <ion-title>Office Inventory</ion-title>
     <!-- only show the “more” button when in detail view -->
@@ -10,7 +14,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" *ngIf="!isUser">
 
   <!-- SEARCH BAR -->
   <ion-searchbar

@@ -101,4 +101,36 @@ public class DAO {
             System.out.println(e.getMessage());
         }
     }
+
+    public Volunteer getVolunteerByUsername(String usernameLinked) {
+        String sql = "SELECT * FROM volunteers WHERE usernameLinked = ?";
+        try (Connection conn = DBUtils.getConnection();
+             var pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, usernameLinked);
+            var rs = pstmt.executeQuery();
+            if (rs.next()) {
+                int id = rs.getInt("id");
+                Double points = rs.getDouble("points");
+                String birthday = rs.getString("birthday");
+                String departamentStr = rs.getString("departament");
+                Departament departament = Departament.valueOf(departamentStr);
+                return new Volunteer(usernameLinked, points, birthday, departament);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return null; // No volunteer found
+    }
+
+    public void addVolunteerPoints(String usernameLinked, Double points) {
+        String sql = "UPDATE volunteers SET points = points + ? WHERE usernameLinked = ?";
+        try (Connection conn = DBUtils.getConnection();
+             var pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDouble(1, points);
+            pstmt.setString(2, usernameLinked);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }

@@ -1,11 +1,15 @@
-<ion-header>
+<ion-header *ngIf="!isUser">
+  <div class="nav-bar">
+    <img src="assets/img/asp-logo.png" alt="ASP Logo" class="asp-logo-small" (click)="goHome()">
+    <span>Asociația Studenților Programatori</span>
+  </div>
   <ion-toolbar>
-    <ion-title>Tasks</ion-title>
+    <ion-title>Sarcini</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-
+<ion-content class="ion-padding" *ngIf="!isUser">
+  <div class="task-container">
   <!-- Add Task Button -->
   <ion-button *ngIf="isCD" expand="block" color="primary" (click)="toggleForm()" >
     {{ showForm ? 'Cancel' : 'Add New Task' }}
@@ -35,7 +39,7 @@
 
       <ion-item>
         <ion-label position="stacked" for="deadline">Deadline</ion-label>
-        <ion-datetime id="deadline" display-format="MMM DD, YYYY HH:mm" formControlName="deadline"></ion-datetime>
+        <ion-datetime id="deadline" display-format="MMM, DD YYYY HH:mm" formControlName="deadline"></ion-datetime>
       </ion-item>
 
       <ion-item>
@@ -47,6 +51,29 @@
     <ion-button expand="full" type="submit" [disabled]="loading">Submit Task</ion-button>
     <ion-text color="danger" *ngIf="error">{{ error }}</ion-text>
   </form>
+
+  <!-- Toggle Completed Section -->
+  <ion-item-divider></ion-item-divider>
+  <ion-button expand="block" fill="outline" (click)="toggleCompletedTasks()">
+    {{ showCompletedTasks ? 'Hide Completed Tasks' : 'Show Completed Tasks' }}
+  </ion-button>
+
+  <!-- Completed Tasks -->
+  <ion-list *ngIf="showCompletedTasks && completedTasks.length">
+    <ion-list-header>Completed Tasks</ion-list-header>
+    <ion-item *ngFor="let t of completedTasks">
+      <ion-label>
+        <h2>{{ t.title }}</h2>
+        <p>Status: {{ t.status }}</p>
+        <p>Owner: {{ t.ownerUsername }}</p>
+        <p>Deadline: {{ t.deadline | date:'DD/MM/YYYY' }}</p>
+        <p *ngIf="t.description">Description: {{ t.description }}</p>
+        <p *ngIf="t.createdAt">Created at: {{ t.createdAt | date:'short' }}</p>
+        <p>Points: {{ t.points }}</p>
+        <p *ngIf="t.volunteers">Assigned to: {{ t.volunteers }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 
   <!-- Active Tasks -->
   <ion-item-divider></ion-item-divider>
@@ -71,29 +98,7 @@
     </ion-item>
   </ion-list>
 
-  <!-- Toggle Completed Section -->
-  <ion-item-divider></ion-item-divider>
-  <ion-button expand="block" fill="outline" (click)="toggleCompletedTasks()">
-    {{ showCompletedTasks ? 'Hide Completed Tasks' : 'Show Completed Tasks' }}
-  </ion-button>
-
-  <!-- Completed Tasks -->
-  <ion-list *ngIf="showCompletedTasks && completedTasks.length">
-    <ion-list-header>Completed Tasks</ion-list-header>
-    <ion-item *ngFor="let t of completedTasks">
-      <ion-label>
-        <h2>{{ t.title }}</h2>
-        <p>Status: {{ t.status }}</p>
-        <p>Owner: {{ t.ownerUsername }}</p>
-        <p>Deadline: {{ t.deadline | date:'short' }}</p>
-        <p *ngIf="t.description">Description: {{ t.description }}</p>
-        <p *ngIf="t.createdAt">Created at: {{ t.createdAt | date:'short' }}</p>
-        <p>Points: {{ t.points }}</p>
-        <p *ngIf="t.volunteers">Assigned to: {{ t.volunteers }}</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
-
   <!-- Fallback -->
   <ion-text *ngIf="!loading && !tasks.length">No tasks found.</ion-text>
+  </div>
 </ion-content>

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController, ActionSheetController } from '@ionic/angular';
 import { OfficeService } from '../../services/office.service';
+import { Router } from "@angular/router";
+import { AuthService } from "../../services/auth.service";
 
 @Component({
   selector: 'app-office',
@@ -12,8 +14,8 @@ export class OfficePage implements OnInit {
   rootStorageUnit: any = null;
   currentStorageUnit: any = null;
   private history: (number | null)[] = [];
+  isUser: boolean = false;
 
-  // for search
   searchQuery: string = '';
   searchResults: any[] = [];
   searchInProgress = false;
@@ -21,11 +23,24 @@ export class OfficePage implements OnInit {
   constructor(
     private officeS: OfficeService,
     private alertCtrl: AlertController,
-    private actionSheetCtrl: ActionSheetController
+    private actionSheetCtrl: ActionSheetController,
+    private router: Router,
+    private auth: AuthService
   ) {}
 
   ngOnInit() {
     this.loadRootList();
+    this.getRole();
+  }
+
+  private async getRole() {
+    try {
+      const role = await this.auth.getUserRole();
+      this.isUser = ['USER', 'VOLUNTEER', 'PM'].includes(role);
+    } catch (err) {
+      console.error('Error fetching user role', err);
+      this.isUser = true;
+    }
   }
 
   private async loadRootList() {
@@ -34,11 +49,10 @@ export class OfficePage implements OnInit {
       this.currentStorageUnit = null;
       this.history = [];
     } catch (err) {
-      console.error('Failed loading storage units', err);
+      this.showAlert('Error', 'Failed to load root storage unit.');
     }
   }
 
-  /** Navigate into a unit */
   async displayStorageUnitDetails(unitId: number) {
     try {
       const details = await this.officeS.getStorageUnitById(unitId);
@@ -46,11 +60,10 @@ export class OfficePage implements OnInit {
       this.history.push(this.currentStorageUnit ? this.currentStorageUnit.id : null);
       this.currentStorageUnit = details;
     } catch (err) {
-      console.error('Error fetching details for', unitId, err);
+      this.showAlert('Error', `Could not load details for unit ID ${unitId}.`);
     }
   }
 
-  /** Navigate back one level */
   async goBack() {
     if (this.history.length > 0) {
       const prevId = this.history.pop()!;
@@ -60,7 +73,7 @@ export class OfficePage implements OnInit {
         try {
           this.currentStorageUnit = await this.officeS.getStorageUnitById(prevId);
         } catch (err) {
-          console.error('Error reloading storage unit', prevId, err);
+          this.showAlert('Error', 'Could not go back to previous storage unit.');
         }
       }
     } else {
@@ -71,14 +84,15 @@ export class OfficePage implements OnInit {
   get isRootView(): boolean {
     return this.currentStorageUnit === null;
   }
+
   get hasSubUnits(): boolean {
     return !!this.currentStorageUnit?.subUnits?.length;
   }
+
   get hasItems(): boolean {
     return !!this.currentStorageUnit?.items?.length;
   }
 
-  /** show the action sheet with all four actions */
   async presentActionSheet() {
     const sheet = await this.actionSheetCtrl.create({
       header: 'Actions',
@@ -110,7 +124,6 @@ export class OfficePage implements OnInit {
     await sheet.present();
   }
 
-  // SEARCH
   async onSearchChange(event: CustomEvent) {
     const q = (event.detail.value || '').trim();
     this.searchQuery = q;
@@ -133,8 +146,7 @@ export class OfficePage implements OnInit {
       }
       this.searchResults = results;
     } catch (err) {
-      console.error('Search error', err);
-      this.searchResults = [];
+      this.showAlert('Search Error', 'Could not perform search.');
     } finally {
       this.searchInProgress = false;
     }
@@ -145,7 +157,10 @@ export class OfficePage implements OnInit {
     this.searchResults = [];
   }
 
-  // ADD NEW UNIT
+  goHome() {
+    this.router.navigate(['/home']);
+  }
+
   async promptNewStorageUnit() {
     if (!this.currentStorageUnit) return;
     const alert = await this.alertCtrl.create({
@@ -157,9 +172,12 @@ export class OfficePage implements OnInit {
           text: 'Create',
           handler: async data => {
             const name = (data.name || '').trim();
-            if (name) {
-              await this.createStorageUnit(name, this.currentStorageUnit!.id);
+            if (!name) {
+              this.showAlert('Validation Error', 'Unit name cannot be empty.');
+              return false;
             }
+            await this.createStorageUnit(name, this.currentStorageUnit.id);
+            return true;
           }
         }
       ]
@@ -173,11 +191,10 @@ export class OfficePage implements OnInit {
       await this.displayStorageUnitDetails(parentId);
       this.history.pop();
     } catch (err) {
-      console.error('Failed to create storage unit', err);
+      this.showAlert('Error', 'Failed to create storage unit.');
     }
   }
 
-  // ADD NEW ITEM
   async promptNewItem() {
     if (!this.currentStorageUnit) return;
     const alert = await this.alertCtrl.create({
@@ -193,9 +210,12 @@ export class OfficePage implements OnInit {
           handler: async data => {
             const name = (data.name || '').trim();
             const qty = Number(data.quantity);
-            if (name && qty > 0) {
-              await this.addItem(name, qty, this.currentStorageUnit!.id);
+            if (!name || isNaN(qty) || qty <= 0) {
+              this.showAlert('Validation Error', 'Provide a valid name and quantity (> 0).');
+              return false;
             }
+            await this.addItem(name, qty, this.currentStorageUnit.id);
+            return true;
           }
         }
       ]
@@ -209,11 +229,10 @@ export class OfficePage implements OnInit {
       await this.displayStorageUnitDetails(unitId);
       this.history.pop();
     } catch (err) {
-      console.error(`Error adding item to storage unit ${unitId}:`, err);
+      this.showAlert('Error', 'Failed to add item.');
     }
   }
 
-  // EDIT ITEM
   async promptEditItem(item: any) {
     const alert = await this.alertCtrl.create({
       header: 'Edit Quantity',
@@ -232,9 +251,14 @@ export class OfficePage implements OnInit {
           text: 'Save',
           handler: async data => {
             const newQty = Number(data.quantity);
-            if (newQty > 0 && newQty !== item.quantity) {
+            if (isNaN(newQty) || newQty <= 0) {
+              this.showAlert('Validation Error', 'Quantity must be a number > 0.');
+              return false;
+            }
+            if (newQty !== item.quantity) {
               await this.updateItemQuantity(item.id, newQty);
             }
+            return true;
           }
         }
       ]
@@ -248,11 +272,10 @@ export class OfficePage implements OnInit {
       await this.displayStorageUnitDetails(this.currentStorageUnit!.id);
       this.history.pop();
     } catch (error) {
-      console.error('Error updating item quantity', error);
+      this.showAlert('Error', 'Failed to update item.');
     }
   }
 
-  // DELETE ITEM
   async confirmDeleteItem(item: any) {
     const alert = await this.alertCtrl.create({
       header: 'Delete Item',
@@ -275,18 +298,21 @@ export class OfficePage implements OnInit {
       await this.displayStorageUnitDetails(this.currentStorageUnit!.id);
       this.history.pop();
     } catch (error) {
-      console.error('Error deleting item', error);
+      this.showAlert('Error', 'Failed to delete item.');
     }
   }
 
-  // DELETE STORAGE UNIT
   async confirmDelete() {
     const alert = await this.alertCtrl.create({
       header: 'Delete Storage Unit',
       message: `Are you sure you want to delete "${this.currentStorageUnit?.name}"? This cannot be undone.`,
       buttons: [
         { text: 'Cancel', role: 'cancel' },
-        { text: 'Delete', role: 'destructive', handler: () => this.deleteCurrentUnit() }
+        {
+          text: 'Delete',
+          role: 'destructive',
+          handler: () => this.deleteCurrentUnit()
+        }
       ]
     });
     await alert.present();
@@ -297,11 +323,10 @@ export class OfficePage implements OnInit {
       await this.officeS.deleteStorageUnit(this.currentStorageUnit!.id);
       this.goBack();
     } catch (error) {
-      console.error('Error deleting storage unit', error);
+      this.showAlert('Error', 'Failed to delete storage unit.');
     }
   }
 
-  // RENAME STORAGE UNIT
   async promptRenameStorageUnit() {
     if (!this.currentStorageUnit) return;
 
@@ -321,9 +346,12 @@ export class OfficePage implements OnInit {
           text: 'Save',
           handler: async data => {
             const newName = (data.name || '').trim();
-            if (newName && newName !== this.currentStorageUnit!.name) {
-              await this.renameStorageUnit(this.currentStorageUnit!.id, newName);
+            if (!newName || newName === this.currentStorageUnit.name) {
+              this.showAlert('Validation Error', 'Please enter a different, non-empty name.');
+              return false;
             }
+            await this.renameStorageUnit(this.currentStorageUnit.id, newName);
+            return true;
           }
         }
       ]
@@ -338,7 +366,16 @@ export class OfficePage implements OnInit {
       await this.displayStorageUnitDetails(id);
       this.history.pop();
     } catch (error) {
-      console.error(`Error renaming storage unit ${id}:`, error);
+      this.showAlert('Error', 'Failed to rename storage unit.');
     }
+  }
+
+  private async showAlert(header: string, message: string) {
+    const alert = await this.alertCtrl.create({
+      header,
+      message,
+      buttons: ['OK']
+    });
+    await alert.present();
   }
 }

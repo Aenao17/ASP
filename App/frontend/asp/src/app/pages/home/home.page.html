@@ -1,6 +1,6 @@
-<ion-content [fullscreen]="true">
+z<ion-content [fullscreen]="true">
   <div class="nav-bar" [class.show]="showNavBar">
-    <img src="assets/img/asp-logo.png" alt="ASP Logo" class="asp-logo-small">
+    <img src="assets/img/asp-logo.png" alt="ASP Logo" class="asp-logo-small" (click)="goHome()">
     <span>Asociația Studenților Programatori</span>
   </div>
 
@@ -16,7 +16,7 @@
       <p>Comunitatea studenților pasionați de programare 💻🚀</p>
     </div>
 
-    <div class="button-section">
+    <div class="button-section" *ngIf="!isUser">
 
       <ion-button *ngIf="isAdmin" class="volunteers-button" (click)="openAdminPage()">
         <ion-icon name="settings-outline" slot="start"></ion-icon>
@@ -37,6 +37,11 @@
         <ion-icon name="business-outline" slot="start"></ion-icon>
         Inventar
       </ion-button>
+    </div>
+    <div class="user-section" *ngIf="isUser">
+      <h1>Oups..., se pare că nu ești înregistrat în asociație.</h1>
+      <p>Te rugăm să te contactezi Vicepreședinte departamentului tău.</p>
+      <p>Dacă nu faci parte din ASP, te așteptăm la recrutări!</p>
     </div>
   </div>
 </ion-content>

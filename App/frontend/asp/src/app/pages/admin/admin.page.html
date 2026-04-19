@@ -1,11 +1,22 @@
-<ion-content [fullscreen]="true">
+<ion-content [fullscreen]="true" *ngIf="isAdmin">
+  <div class="nav-bar">
+    <img src="assets/img/asp-logo.png" alt="ASP Logo" class="asp-logo-small" (click)="goHome()">
+    <span>Asociația Studenților Programatori</span>
+  </div>
+
   <div class="admin-container">
-    <h1>ADMINISTRATOR DASHBOARD</h1>
+    <h1><br>ADMINISTRATOR DASHBOARD</h1>
+
+    <!-- Searchbar -->
+    <ion-item lines="none">
+      <ion-label position="floating">Search by name or username</ion-label>
+      <ion-input [(ngModel)]="searchTerm"></ion-input>
+    </ion-item>
 
     <div class="user-list">
       <h2>Users</h2>
       <ul>
-        <li *ngFor="let user of users" class="user-card">
+        <li *ngFor="let user of filteredUsers" class="user-card">
           <h3>{{ user.firstName }} {{ user.lastName }} ({{ user.username }})</h3>
           <p><strong>Email:</strong> {{ user.email }}</p>
           <p><strong>Institutional Email:</strong> {{ user.institutionalEmail }}</p>
@@ -32,20 +43,34 @@
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
+
       <ion-content>
         <ion-list>
           <ion-item>
             <ion-label position="stacked">First Name</ion-label>
             <ion-input [(ngModel)]="selectedUser.firstName"></ion-input>
           </ion-item>
+
           <ion-item>
             <ion-label position="stacked">Last Name</ion-label>
             <ion-input [(ngModel)]="selectedUser.lastName"></ion-input>
           </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Email</ion-label>
+            <ion-input type="email" [(ngModel)]="selectedUser.email"></ion-input>
+          </ion-item>
+
+          <ion-item>
+            <ion-label position="stacked">Institutional Email</ion-label>
+            <ion-input type="email" [(ngModel)]="selectedUser.institutionalEmail"></ion-input>
+          </ion-item>
+
           <ion-item>
             <ion-label position="stacked">Phone Number</ion-label>
             <ion-input [(ngModel)]="selectedUser.phoneNumber"></ion-input>
           </ion-item>
+
           <ion-item>
             <ion-label position="stacked">Role</ion-label>
             <ion-select [(ngModel)]="selectedUser.role">
@@ -53,6 +78,7 @@
             </ion-select>
           </ion-item>
         </ion-list>
+
         <ion-button expand="full" (click)="saveUser()">Save</ion-button>
       </ion-content>
     </ng-template>

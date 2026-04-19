@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { VolunteerService } from '../../services/volunteer.service';
 import { NavController, AlertController } from '@ionic/angular';
+import { Router } from "@angular/router";
+import { AuthService } from "../../services/auth.service";
 
 @Component({
   selector: 'app-volunteers',
@@ -15,6 +17,9 @@ export class VolunteersPage implements OnInit {
   isAddFormOpen = false;
   usernameError = false;
   isLoading = false;
+  userRole: string | null = null;
+  displayOnlyPoints = false;
+  points = 0;
 
   searchTerm = '';
   selectedDepartment: string | null = null;
@@ -30,19 +35,42 @@ export class VolunteersPage implements OnInit {
     departament: 'HR'
   };
 
+  sortOption: string = 'name';
+
   constructor(
     private volunteerS: VolunteerService,
     private navCtrl: NavController,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private router: Router,
+    private auth: AuthService
   ) {}
 
-  ngOnInit() {
-    this.getVolunteers();
+  async ngOnInit() {
+    this.getRole().then(role => {
+      this.userRole = role;
+      if (this.userRole === 'USER' || this.userRole === 'VOLUNTEER' || this.userRole === 'PM') {
+        this.displayOnlyPoints = true;
+        this.getPoints();
+      } else {
+        this.getVolunteers();
+      }
+    });
+    await this.sync();
   }
 
   async sync() {
     await this.volunteerS.syncVolunteers();
     await this.getVolunteers();
+  }
+
+  async getPoints() {
+    try {
+      const volunteer = await this.volunteerS.getVolunteerByUsername(await this.auth.getUsername());
+      this.points = volunteer ? volunteer.points : 0;
+    } catch (error) {
+      console.error('Error fetching volunteer points:', error);
+      this.showAlert('Error', 'Failed to fetch your points. Please try again later.');
+    }
   }
 
   async getVolunteers() {
@@ -57,8 +85,6 @@ export class VolunteersPage implements OnInit {
       console.error('Error fetching volunteers:', error);
     }
   }
-
-  sortOption: string = 'name';
 
   get filteredVolunteers() {
     let result = this.volunteers.filter(v => {
@@ -80,7 +106,6 @@ export class VolunteersPage implements OnInit {
       return matchesSearch && matchesDepartment && matchesPoints;
     });
 
-    // Apply sorting
     switch (this.sortOption) {
       case 'name':
         result.sort((a, b) =>
@@ -101,17 +126,83 @@ export class VolunteersPage implements OnInit {
     return result;
   }
 
+  goHome() {
+    this.router.navigate(['/home']);
+  }
+
+  async getRole() {
+    try {
+      const role = await this.auth.getUserRole();
+      return role;
+    } catch (error) {
+      console.error('Error fetching user role:', error);
+      return null;
+    }
+  }
 
   toggleAddForm() {
     this.isAddFormOpen = !this.isAddFormOpen;
     this.usernameError = false;
   }
 
+  async addPointsToVolunteer(username: string) {
+    const alert = await this.alertCtrl.create({
+      header: 'Add Points',
+      inputs: [
+        {
+          name: 'points',
+          type: 'number',
+          placeholder: 'Enter points to add'
+        }
+      ],
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel'
+        },
+        {
+          text: 'Add',
+          handler: async (data) => {
+            if (data.points && !isNaN(data.points)) {
+              try {
+                await this.volunteerS.addPointsToVolunteer(username, data.points);
+                await this.getVolunteers();
+              } catch (error) {
+                console.error('Error adding points:', error);
+                this.showAlert('Error', 'Failed to add points. Please try again.');
+              }
+            } else {
+              this.showAlert('Invalid Input', 'Please enter a valid number of points.');
+            }
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
   async addVolunteer() {
     this.usernameError = false;
+    const { usernameLinked, points, birthday, departament } = this.newVolunteer;
 
-    if (!this.newVolunteer.usernameLinked || this.newVolunteer.usernameLinked.trim() === '') {
+    if (!usernameLinked || usernameLinked.trim() === '') {
       this.usernameError = true;
+      this.showAlert('Input Error', 'Username is required.');
+      return;
+    }
+
+    if (points == null || isNaN(points) || points < 0) {
+      this.showAlert('Input Error', 'Please enter a valid non-negative number of points.');
+      return;
+    }
+
+    if (!birthday || birthday.trim() === '') {
+      this.showAlert('Input Error', 'Please select a birthday.');
+      return;
+    }
+
+    if (!departament || departament.trim() === '') {
+      this.showAlert('Input Error', 'Please choose a department.');
       return;
     }
 
@@ -128,12 +219,7 @@ export class VolunteersPage implements OnInit {
       await this.getVolunteers();
     } catch (error) {
       console.error('Error adding volunteer:', error);
-      const alert = await this.alertCtrl.create({
-        header: 'Add Error',
-        message: 'Failed to add volunteer. Please try again.',
-        buttons: ['OK']
-      });
-      await alert.present();
+      this.showAlert('Add Error', 'Failed to add volunteer. Please try again.');
     } finally {
       this.isLoading = false;
     }
@@ -145,19 +231,31 @@ export class VolunteersPage implements OnInit {
   }
 
   async saveVolunteer() {
+    const { points, birthday, departament } = this.selectedVolunteer;
+
+    if (points == null || isNaN(points) || points < 0) {
+      this.showAlert('Input Error', 'Please enter a valid non-negative number of points.');
+      return;
+    }
+
+    if (!birthday || birthday.trim() === '') {
+      this.showAlert('Input Error', 'Please select a birthday.');
+      return;
+    }
+
+    if (!departament || departament.trim() === '') {
+      this.showAlert('Input Error', 'Please choose a department.');
+      return;
+    }
+
     try {
-      this.selectedVolunteer.birthday = this.selectedVolunteer.birthday?.substring(0, 10).split("-").reverse().join("-");
+      this.selectedVolunteer.birthday = birthday.substring(0, 10).split("-").reverse().join("-");
       await this.volunteerS.updateVolunteer(this.selectedVolunteer.username, this.selectedVolunteer);
       this.isEditModalOpen = false;
       await this.getVolunteers();
     } catch (error) {
       console.error('Error updating volunteer:', error);
-      const alert = await this.alertCtrl.create({
-        header: 'Update Error',
-        message: 'Failed to update volunteer. Please try again.',
-        buttons: ['OK']
-      });
-      await alert.present();
+      this.showAlert('Update Error', 'Failed to update volunteer. Please try again.');
     }
   }
 
@@ -170,17 +268,21 @@ export class VolunteersPage implements OnInit {
       await this.getVolunteers();
     } catch (error) {
       console.error('Error deleting volunteer:', error);
-      const alert = await this.alertCtrl.create({
-        header: 'Delete Error',
-        message: 'Failed to delete volunteer. Please try again.',
-        buttons: ['OK']
-      });
-      await alert.present();
+      this.showAlert('Delete Error', 'Failed to delete volunteer. Please try again.');
     }
   }
 
   closeEditModal() {
     this.isEditModalOpen = false;
     this.selectedVolunteer = null;
+  }
+
+  private async showAlert(header: string, message: string) {
+    const alert = await this.alertCtrl.create({
+      header,
+      message,
+      buttons: ['OK']
+    });
+    await alert.present();
   }
 }

@@ -98,6 +98,55 @@ public class VolunteerProxyController {
         return ResponseEntity.ok(fullVolunteers);
     }
 
+    @GetMapping("/{username}")
+    public ResponseEntity<?> getVolunteerByUsername(
+            @PathVariable String username,
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        String role = extractUserRole(authHeader);
+        // Get volunteer from volunteer service
+        ResponseEntity<VolunteerDTO> volunteerResponse = restTemplate.exchange(
+                volunteerServiceUrl + "/api/volunteers/" + username,
+                HttpMethod.GET,
+                null,
+                VolunteerDTO.class
+        );
+        VolunteerDTO volunteer = volunteerResponse.getBody();
+
+        if (volunteer == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Volunteer not found.");
+        }
+        return ResponseEntity.ok(volunteer);
+    }
+
+    @PutMapping("/{username}/add-points")
+    public ResponseEntity<String> addPointsToVolunteer(
+            @PathVariable String username,
+            @RequestBody String pointsJson,
+            @RequestHeader("Authorization") String authHeader
+    ) {
+        String role = extractUserRole(authHeader);
+        if (!isAllowedForPost(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Access denied: only CD, ADMIN, or ADMINISTRATOR can add points to volunteers.");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", authHeader);
+
+        HttpEntity<String> requestEntity = new HttpEntity<>(pointsJson, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                volunteerServiceUrl + "/api/volunteers/" + username + "/points",
+                HttpMethod.PUT,
+                requestEntity,
+                String.class
+        );
+
+        return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+    }
+
     @GetMapping("/sync-points")
     public ResponseEntity<Object> syncPoints(@RequestHeader("Authorization") String authHeader) {
         String role = extractUserRole(authHeader);
