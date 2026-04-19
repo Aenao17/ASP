@@ -24,9 +24,11 @@ jobs:
           java-version: 17
 
       - name: Build with Gradle
+        working-directory: App
         run: ./gradlew build
 
       - name: SonarQube Cloud Scan
+        working-directory: App
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew sonar
