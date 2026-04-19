@@ -17,6 +17,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TaskProxyController {
 
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+
     private final JwtService jwtService;
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -24,7 +26,7 @@ public class TaskProxyController {
     private String taskServiceUrl;
 
     @GetMapping
-    public ResponseEntity<?> getAllTasks(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> getAllTasks(@RequestHeader(AUTHORIZATION_HEADER) String authHeader) {
         String role = extractUserRole(authHeader);
         if (!isAllowedForGet(role)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -32,7 +34,7 @@ public class TaskProxyController {
         }
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", authHeader);
+        headers.set(AUTHORIZATION_HEADER, authHeader);
         HttpEntity<?> entity = new HttpEntity<>(headers);
 
         ResponseEntity<Task[]> taskResponse = restTemplate.exchange(
@@ -49,7 +51,7 @@ public class TaskProxyController {
     @PostMapping
     public ResponseEntity<Object> createTask(
             @RequestBody String taskJson,
-            @RequestHeader("Authorization") String authHeader
+            @RequestHeader(AUTHORIZATION_HEADER) String authHeader
     ) {
         String role = extractUserRole(authHeader);
         if (!isAllowedForPost(role)) {
@@ -59,7 +61,7 @@ public class TaskProxyController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", authHeader);
+        headers.set(AUTHORIZATION_HEADER, authHeader);
 
         HttpEntity<Object> requestEntity = new HttpEntity<>(taskJson, headers);
 
@@ -76,7 +78,7 @@ public class TaskProxyController {
     @PutMapping
     public ResponseEntity<String> updateTask(
             @RequestBody String taskJson,
-            @RequestHeader("Authorization") String authHeader
+            @RequestHeader(AUTHORIZATION_HEADER) String authHeader
     ) {
         String role = extractUserRole(authHeader);
         if (!isAllowedForPut(role)) {
@@ -86,7 +88,7 @@ public class TaskProxyController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", authHeader);
+        headers.set(AUTHORIZATION_HEADER, authHeader);
 
         HttpEntity<String> requestEntity = new HttpEntity<>(taskJson, headers);
 
@@ -103,7 +105,7 @@ public class TaskProxyController {
     @PutMapping("/complete")
     public ResponseEntity<String> completeTask(
             @RequestBody String taskJson,
-            @RequestHeader("Authorization") String authHeader
+            @RequestHeader(AUTHORIZATION_HEADER) String authHeader
     ) {
         String role = extractUserRole(authHeader);
         if (!isAllowedForPut(role)) {
@@ -113,7 +115,7 @@ public class TaskProxyController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", authHeader);
+        headers.set(AUTHORIZATION_HEADER, authHeader);
 
         HttpEntity<String> requestEntity = new HttpEntity<>(taskJson, headers);
 
@@ -138,7 +140,7 @@ public class TaskProxyController {
                 || "ADMIN".equals(role)
                 || "CD".equals(role)
                 || "PM".equals(role)
-        || "VOLUNTEER".equals(role);
+                || "VOLUNTEER".equals(role);
     }
 
     private String extractToken(String authHeader) {

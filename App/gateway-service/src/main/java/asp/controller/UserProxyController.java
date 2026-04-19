@@ -13,6 +13,11 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class UserProxyController {
 
+    private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String ADMINISTRATOR_ROLE = "ADMINISTRATOR";
+    private static final String ACCESS_DENIED_MESSAGE =
+            "Acces interzis: doar ADMINISTRATOR poate accesa această resursă.";
+
     private final JwtService jwtService;
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -20,17 +25,17 @@ public class UserProxyController {
     private String userServiceUrl;
 
     @GetMapping
-    public ResponseEntity<String> getAllUsers( @RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<String> getAllUsers(@RequestHeader(AUTHORIZATION_HEADER) String authHeader) {
         String token = extractToken(authHeader);
         Claims claims = jwtService.extractAllClaims(token);
         String role = claims.get("role", String.class);
 
-        if (!"ADMINISTRATOR".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acces interzis: doar ADMINISTRATOR poate accesa această resursă.");
+        if (!ADMINISTRATOR_ROLE.equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ACCESS_DENIED_MESSAGE);
         }
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", authHeader);
+        headers.set(AUTHORIZATION_HEADER, authHeader);
 
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
@@ -45,17 +50,17 @@ public class UserProxyController {
     }
 
     @GetMapping("/roles")
-    public ResponseEntity<String> getAvailableRoles(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<String> getAvailableRoles(@RequestHeader(AUTHORIZATION_HEADER) String authHeader) {
         String token = extractToken(authHeader);
         Claims claims = jwtService.extractAllClaims(token);
         String role = claims.get("role", String.class);
 
-        if (!"ADMINISTRATOR".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acces interzis: doar ADMINISTRATOR poate accesa această resursă.");
+        if (!ADMINISTRATOR_ROLE.equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ACCESS_DENIED_MESSAGE);
         }
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", authHeader);
+        headers.set(AUTHORIZATION_HEADER, authHeader);
 
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
@@ -72,18 +77,18 @@ public class UserProxyController {
     @DeleteMapping("/{username}")
     public ResponseEntity<String> deleteUserByUsername(
             @PathVariable String username,
-            @RequestHeader("Authorization") String authHeader
+            @RequestHeader(AUTHORIZATION_HEADER) String authHeader
     ) {
         String token = extractToken(authHeader);
         Claims claims = jwtService.extractAllClaims(token);
         String role = claims.get("role", String.class);
 
-        if (!"ADMINISTRATOR".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acces interzis: doar ADMINISTRATOR poate accesa această resursă.");
+        if (!ADMINISTRATOR_ROLE.equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ACCESS_DENIED_MESSAGE);
         }
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", authHeader);
+        headers.set(AUTHORIZATION_HEADER, authHeader);
 
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
@@ -101,19 +106,19 @@ public class UserProxyController {
     public ResponseEntity<String> updateUser(
             @PathVariable String username,
             @RequestBody String userJson,
-            @RequestHeader("Authorization") String authHeader
+            @RequestHeader(AUTHORIZATION_HEADER) String authHeader
     ) {
         String token = extractToken(authHeader);
         Claims claims = jwtService.extractAllClaims(token);
         String role = claims.get("role", String.class);
 
-        if (!"ADMINISTRATOR".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acces interzis: doar ADMINISTRATOR poate accesa această resursă.");
+        if (!ADMINISTRATOR_ROLE.equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ACCESS_DENIED_MESSAGE);
         }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", authHeader);
+        headers.set(AUTHORIZATION_HEADER, authHeader);
 
         HttpEntity<String> requestEntity = new HttpEntity<>(userJson, headers);
 
@@ -131,6 +136,7 @@ public class UserProxyController {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             return authHeader.substring(7);
         }
-        throw new RuntimeException("Token JWT lipsă sau invalid");
+        // Refactored: Replaced RuntimeException with IllegalArgumentException
+        throw new IllegalArgumentException("Token JWT lipsă sau invalid");
     }
 }
