@@ -1,12 +1,5 @@
 .idea
 
-.gradle
-
-gradle
-
-gradlew
-gradlew.bat
-
 *.iml
 
 build
