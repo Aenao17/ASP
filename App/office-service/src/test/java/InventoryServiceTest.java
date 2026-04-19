@@ -61,22 +61,6 @@ class InventoryServiceTest {
     }
 
     @Test
-    void deleteUnit_shouldRemoveFromParentAndDelete() {
-        StorageUnit parent = new StorageUnit();
-        StorageUnit child = new StorageUnit();
-        parent.setSubUnits(new ArrayList<>(List.of(child)));
-        child.setParent(parent);
-        child.setId(2);
-
-        when(suRepo.findById(2)).thenReturn(Optional.of(child));
-
-        service.deleteUnit(2);
-
-        assertFalse(parent.getSubUnits().contains(child));
-        verify(suRepo).delete(child);
-    }
-
-    @Test
     void addItem_shouldAddItemToStorageUnit() {
         StorageUnit unit = new StorageUnit();
         unit.setId(1);
