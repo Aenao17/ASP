@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from "../../services/auth.service";
 import { Router } from "@angular/router";
 
@@ -8,7 +8,7 @@ import { Router } from "@angular/router";
   styleUrls: ['home.page.scss'],
   standalone: false,
 })
-export class HomePage {
+export class HomePage implements OnInit {
   shrinkLogo = false;
   showNavBar = false;
   username = '';
@@ -16,8 +16,8 @@ export class HomePage {
   isCD = false;
   isUser = false;
 
-
-  constructor(private auth: AuthService, private router: Router) {}
+  // Refactored: Added readonly modifier to injected services
+  constructor(private readonly auth: AuthService, private readonly router: Router) {}
 
   ngOnInit() {
     this.getUsername();
@@ -29,12 +29,12 @@ export class HomePage {
     this.getUserRole();
   }
 
-  goHome(){
+  goHome() {
     this.router.navigate(['/home']);
   }
 
   async getUsername() {
-    this.username =  await this.auth.getUsername();
+    this.username = await this.auth.getUsername();
   }
 
   openVolunteersPage() {
@@ -57,18 +57,16 @@ export class HomePage {
     }
   }
 
-
-  private async getUserRole(){
+  private async getUserRole() {
     const role = await this.auth.getUserRole();
-    if (role=="ADMINISTRATOR"){
-      this.isAdmin=true;
+    if (role === "ADMINISTRATOR") {
+      this.isAdmin = true;
     }
-    if (role=="CD" || role=="ADMINISTRATOR"){
-      this.isCD=true;
+    if (role === "CD" || role === "ADMINISTRATOR") {
+      this.isCD = true;
     }
-
-    if (role=="USER"){
-      this.isUser=true;
+    if (role === "USER") {
+      this.isUser = true;
     }
   }
 

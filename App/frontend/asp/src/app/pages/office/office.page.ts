@@ -49,6 +49,7 @@ export class OfficePage implements OnInit {
       this.currentStorageUnit = null;
       this.history = [];
     } catch (err) {
+      console.error('Failed to load root storage unit:', err);
       this.showAlert('Error', 'Failed to load root storage unit.');
     }
   }
@@ -60,6 +61,7 @@ export class OfficePage implements OnInit {
       this.history.push(this.currentStorageUnit ? this.currentStorageUnit.id : null);
       this.currentStorageUnit = details;
     } catch (err) {
+      console.error(`Could not load details for unit ID ${unitId}:`, err);
       this.showAlert('Error', `Could not load details for unit ID ${unitId}.`);
     }
   }
@@ -73,6 +75,7 @@ export class OfficePage implements OnInit {
         try {
           this.currentStorageUnit = await this.officeS.getStorageUnitById(prevId);
         } catch (err) {
+          console.error('Could not go back to previous storage unit:', err);
           this.showAlert('Error', 'Could not go back to previous storage unit.');
         }
       }
@@ -146,6 +149,7 @@ export class OfficePage implements OnInit {
       }
       this.searchResults = results;
     } catch (err) {
+      console.error('Could not perform search:', err);
       this.showAlert('Search Error', 'Could not perform search.');
     } finally {
       this.searchInProgress = false;
@@ -191,6 +195,7 @@ export class OfficePage implements OnInit {
       await this.displayStorageUnitDetails(parentId);
       this.history.pop();
     } catch (err) {
+      console.error('Failed to create storage unit:', err);
       this.showAlert('Error', 'Failed to create storage unit.');
     }
   }
@@ -229,6 +234,7 @@ export class OfficePage implements OnInit {
       await this.displayStorageUnitDetails(unitId);
       this.history.pop();
     } catch (err) {
+      console.error('Failed to add item:', err);
       this.showAlert('Error', 'Failed to add item.');
     }
   }
@@ -272,6 +278,7 @@ export class OfficePage implements OnInit {
       await this.displayStorageUnitDetails(this.currentStorageUnit!.id);
       this.history.pop();
     } catch (error) {
+      console.error('Failed to update item quantity:', error);
       this.showAlert('Error', 'Failed to update item.');
     }
   }
@@ -298,6 +305,7 @@ export class OfficePage implements OnInit {
       await this.displayStorageUnitDetails(this.currentStorageUnit!.id);
       this.history.pop();
     } catch (error) {
+      console.error('Failed to delete item:', error);
       this.showAlert('Error', 'Failed to delete item.');
     }
   }
@@ -323,6 +331,7 @@ export class OfficePage implements OnInit {
       await this.officeS.deleteStorageUnit(this.currentStorageUnit!.id);
       this.goBack();
     } catch (error) {
+      console.error('Failed to delete current storage unit:', error);
       this.showAlert('Error', 'Failed to delete storage unit.');
     }
   }
@@ -366,6 +375,7 @@ export class OfficePage implements OnInit {
       await this.displayStorageUnitDetails(id);
       this.history.pop();
     } catch (error) {
+      console.error('Failed to rename storage unit:', error);
       this.showAlert('Error', 'Failed to rename storage unit.');
     }
   }
