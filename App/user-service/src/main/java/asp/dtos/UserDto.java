@@ -6,8 +6,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
-@Setter
-@Getter
+@Setter @Getter
 public class UserDto implements Serializable {
     private String username;
     private String email;
