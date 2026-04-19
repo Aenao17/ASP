@@ -13,6 +13,7 @@ sonar {
     properties {
         property "sonar.projectKey", "Aenao17_ASP"
         property "sonar.organization", "aenao17"
+        property "sonar.sources", "frontend/asp/src"
     }
 }
 

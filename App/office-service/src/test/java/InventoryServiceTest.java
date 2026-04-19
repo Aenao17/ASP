@@ -59,7 +59,6 @@ class InventoryServiceTest {
         assertEquals(1, parent.getSubUnits().size());
         assertEquals("Child", parent.getSubUnits().get(0).getName());
     }
-
     @Test
     void addItem_shouldAddItemToStorageUnit() {
         StorageUnit unit = new StorageUnit();
